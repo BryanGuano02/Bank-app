@@ -12,6 +12,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<DdContext>(options =>
     options.UseSqlite(connectionString));
 
+// Expose IDdContext as a scoped dependency resolved to DdContext
+builder.Services.AddScoped<IDdContext>(sp => sp.GetRequiredService<DdContext>());
+
 // Application services
 builder.Services.AddScoped<MovimientoService>();
 

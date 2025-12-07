@@ -3,7 +3,7 @@ using Domain.Entities;
 
 namespace Fast_Bank.Infrastructure.Persistence
 {
-    public class DdContext : DbContext
+    public class DdContext : DbContext, IDdContext
     {
         public DdContext(DbContextOptions<DdContext> options)
             : base(options)
