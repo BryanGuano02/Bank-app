@@ -366,7 +366,7 @@
         <mxCell id="RvjSiO_lYqvvrtNufV2A-23" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="RvjSiO_lYqvvrtNufV2A-21" vertex="1">
           <mxGeometry y="100" width="290" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="aSviBojZNcq5J4428p6_-48" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;+ depositar(monto: double): void&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;+ retirar(monto: double): void&lt;/div&gt;&lt;div&gt;+ transferir(destino: Cuenta, monto: double): void&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="RvjSiO_lYqvvrtNufV2A-21" vertex="1">
+        <mxCell id="aSviBojZNcq5J4428p6_-48" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;+ depositar(monto: double): void&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;+ retirar(monto: double): void&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="RvjSiO_lYqvvrtNufV2A-21" vertex="1">
           <mxGeometry y="108" width="290" height="62" as="geometry" />
         </mxCell>
         <mxCell id="RvjSiO_lYqvvrtNufV2A-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;" parent="1" source="RvjSiO_lYqvvrtNufV2A-25" target="RvjSiO_lYqvvrtNufV2A-21" edge="1">
@@ -501,7 +501,7 @@
         <mxCell id="YTsodMDTUooxiCx6Iox9-12" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="YTsodMDTUooxiCx6Iox9-11" vertex="1">
           <mxGeometry y="30" width="230" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="YTsodMDTUooxiCx6Iox9-13" value="+ validar(Cuenta, Cuenta, double)&lt;div&gt;+ procesar(Cuenta, Cuenta, double)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-11" vertex="1">
+        <mxCell id="YTsodMDTUooxiCx6Iox9-13" value="+ validar(Movimiento)&lt;div&gt;+ procesar(Movimiento)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-11" vertex="1">
           <mxGeometry y="38" width="230" height="41" as="geometry" />
         </mxCell>
         <mxCell id="YTsodMDTUooxiCx6Iox9-14" value="RetiroTipo" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -510,7 +510,7 @@
         <mxCell id="YTsodMDTUooxiCx6Iox9-15" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="YTsodMDTUooxiCx6Iox9-14" vertex="1">
           <mxGeometry y="30" width="220" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="YTsodMDTUooxiCx6Iox9-16" value="+ validar(Cuenta, Cuenta, double)&lt;div&gt;+ procesar(Cuenta, Cuenta, double)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-14" vertex="1">
+        <mxCell id="YTsodMDTUooxiCx6Iox9-16" value="+ validar(Movimiento)&lt;div&gt;+ procesar(Movimiento)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-14" vertex="1">
           <mxGeometry y="38" width="220" height="41" as="geometry" />
         </mxCell>
         <mxCell id="YTsodMDTUooxiCx6Iox9-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=0;" parent="1" source="YTsodMDTUooxiCx6Iox9-17" target="YTsodMDTUooxiCx6Iox9-1" edge="1">
@@ -527,7 +527,7 @@
         <mxCell id="YTsodMDTUooxiCx6Iox9-18" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="YTsodMDTUooxiCx6Iox9-17" vertex="1">
           <mxGeometry y="30" width="220" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="YTsodMDTUooxiCx6Iox9-19" value="+ validar(Cuenta, Cuenta, double)&lt;div&gt;+ procesar(Cuenta, Cuenta, double)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-17" vertex="1">
+        <mxCell id="YTsodMDTUooxiCx6Iox9-19" value="+ validar(Movimiento)&lt;div&gt;+ procesar(Movimiento)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-17" vertex="1">
           <mxGeometry y="38" width="220" height="41" as="geometry" />
         </mxCell>
         <mxCell id="YTsodMDTUooxiCx6Iox9-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;dashed=1;" parent="1" source="YTsodMDTUooxiCx6Iox9-20" target="YTsodMDTUooxiCx6Iox9-1" edge="1">
@@ -544,7 +544,7 @@
         <mxCell id="YTsodMDTUooxiCx6Iox9-21" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="YTsodMDTUooxiCx6Iox9-20" vertex="1">
           <mxGeometry y="30" width="220" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="YTsodMDTUooxiCx6Iox9-22" value="+ validar(Cuenta, Cuenta, double)&lt;div&gt;+ procesar(Cuenta, Cuenta, double)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-20" vertex="1">
+        <mxCell id="YTsodMDTUooxiCx6Iox9-22" value="+ validar(Movimiento)&lt;div&gt;+ procesar(Movimiento)&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="YTsodMDTUooxiCx6Iox9-20" vertex="1">
           <mxGeometry y="38" width="220" height="41" as="geometry" />
         </mxCell>
         <mxCell id="YTsodMDTUooxiCx6Iox9-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;endArrow=block;endFill=0;" parent="1" source="YTsodMDTUooxiCx6Iox9-14" target="YTsodMDTUooxiCx6Iox9-1" edge="1">
