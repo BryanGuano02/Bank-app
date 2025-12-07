@@ -3,13 +3,25 @@ using System;
 
 namespace Domain.Entities
 {
+    using System.ComponentModel.DataAnnotations;
+
     public abstract class Cuenta
     {
+        [Key]
         public string NumeroCuenta { get; private set; }
         public decimal Saldo { get; private set; }
         public DateTime FechaApertura { get; private set; }
-        
+
         private IEstadoCuenta _estado;
+
+        // Parameterless constructor for EF Core
+        protected Cuenta()
+        {
+            NumeroCuenta = string.Empty;
+            Saldo = 0m;
+            FechaApertura = DateTime.UtcNow;
+            _estado = null!;
+        }
 
         protected Cuenta(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
         {

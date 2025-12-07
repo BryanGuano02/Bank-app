@@ -2,12 +2,24 @@ using System;
 
 namespace Domain.Entities
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class EntidadFinanciera
     {
+        [Key]
         public string IdEntidad { get; private set; }
         public string Nombre { get; private set; }
         public string Ciudad { get; private set; }
         public string Direccion { get; private set; }
+
+        // Parameterless constructor for EF Core
+        protected EntidadFinanciera()
+        {
+            IdEntidad = string.Empty;
+            Nombre = string.Empty;
+            Ciudad = string.Empty;
+            Direccion = string.Empty;
+        }
 
         public EntidadFinanciera(string idEntidad, string nombre, string ciudad, string direccion)
         {

@@ -3,14 +3,20 @@ using System;
 
 namespace Domain.Entities
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class TarjetaCredito
     {
+        [Key]
         public string NumeroTarjeta { get; private set; }
         public decimal LimiteCredito { get; private set; }
         public decimal SaldoPendiente { get; private set; }
         public Cliente Cliente { get; private set; }
 
         private IEstadoTarjeta _estado;
+
+        // Constructor parameterless para EF Core
+        protected TarjetaCredito() { }
 
         public TarjetaCredito(string numeroTarjeta, decimal limiteCredito, Cliente cliente, IEstadoTarjeta estadoInicial)
         {

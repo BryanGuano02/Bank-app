@@ -1,10 +1,13 @@
-using Domain.Interfaces.States;
+using Domain.Entities;
 using System;
 
 namespace Domain.Entities
 {
+    using System.ComponentModel.DataAnnotations;
+
     public class Movimiento
     {
+        [Key]
         public string IdMovimiento { get; private set; }
         public decimal Monto { get; private set; }
         public DateTime Fecha { get; private set; }
@@ -12,6 +15,9 @@ namespace Domain.Entities
 
         public Cuenta Origen { get; private set; }
         public Cuenta Destino { get; private set; }
+
+        // Parameterless constructor required by EF Core for materialization
+        protected Movimiento() { }
 
         public Movimiento(string idMovimiento, decimal monto, Cuenta origen, Cuenta destino, string descripcion)
         {

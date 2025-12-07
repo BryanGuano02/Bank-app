@@ -8,6 +8,12 @@ namespace Domain.Entities
     {
         public decimal LimiteSobregiro { get; private set; }
 
+        // Parameterless constructor for EF Core
+        protected CuentaCorriente() : base()
+        {
+            LimiteSobregiro = 0m;
+        }
+
         public CuentaCorriente(string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro, IEstadoCuenta estadoInicial)
             : base(numeroCuenta, saldoInicial, estadoInicial)
         {

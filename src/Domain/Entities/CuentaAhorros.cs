@@ -8,6 +8,12 @@ namespace Domain.Entities
     {
         public double TasaInteres { get; private set; }
 
+        // Parameterless constructor for EF Core
+        protected CuentaAhorros() : base()
+        {
+            TasaInteres = 0;
+        }
+
         public CuentaAhorros(string numeroCuenta, decimal saldoInicial, double tasaInteres, IEstadoCuenta estadoInicial)
             : base(numeroCuenta, saldoInicial, estadoInicial)
         {
