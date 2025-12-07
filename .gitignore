@@ -1,0 +1,107 @@
+# Visual Studio / .NET Core / C# .gitignore
+# See https://github.com/github/gitignore for templates
+
+## Build Folders
+/bin/
+/obj/
+**/[bB]in/
+**/[oO]bj/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider
+.idea/
+*.sln.iml
+
+## VS Code
+.vscode/
+
+## NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Build outputs
+*.dll
+*.exe
+*.app
+*.appx
+*.msi
+*.apk
+*.xap
+*.unitypackage
+*.so
+*.dylib
+*.lib
+*.a
+*.pdb
+*.ilk
+*.map
+*.obj
+
+## Logs
+*.log
+*.tlog
+
+## Test Results
+TestResults/
+*.trx
+coverage.*
+*.coverage
+*.coveragexml
+
+## Publish
+publish/
+publish_output/
+
+## Local user-specific files
+*.vsix
+*.vsixmanifest
+*.njsproj.user
+*.dbmdl
+*.bak
+*.backup
+
+## Dotnet user-secrets
+secrets.json
+
+## Rider and Resharper
+_ReSharper*/
+*.DotSettings.user
+
+## Azure Web Sites
+*.Publish.xml
+
+## Mono Auto Generated Files
+mono_crash.*
+
+## OS Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+## Package distribution
+*.7z
+*.zip
+*.tar.gz
+*.rar
+
+## Node / frontend
+node_modules/
+dist/
+
+## Others
+*.log
+*.cache
+*.ide
+
+# Ignore appsettings for local development
+appsettings.Development.json
