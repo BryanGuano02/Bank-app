@@ -3,10 +3,36 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fast-Bank.API", "src\API\Fast-Bank.API.csproj", "{B996064D-9785-BE55-5324-98125ECF7F5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fast-Bank.Application", "src\Application\Fast-Bank.Application.csproj", "{5570670A-6A9C-AFB9-2704-E5E0869C9AEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fast-Bank.Domain", "src\Domain\Fast-Bank.Domain.csproj", "{EA9D2B42-D4B7-01F2-7387-6D0D0A92741B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fast-Bank.Infrastructure", "src\Infrastructure\Fast-Bank.Infrastructure.csproj", "{F8682E86-6D61-D1A4-AE58-3A985563222C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B996064D-9785-BE55-5324-98125ECF7F5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B996064D-9785-BE55-5324-98125ECF7F5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B996064D-9785-BE55-5324-98125ECF7F5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B996064D-9785-BE55-5324-98125ECF7F5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5570670A-6A9C-AFB9-2704-E5E0869C9AEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5570670A-6A9C-AFB9-2704-E5E0869C9AEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5570670A-6A9C-AFB9-2704-E5E0869C9AEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5570670A-6A9C-AFB9-2704-E5E0869C9AEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA9D2B42-D4B7-01F2-7387-6D0D0A92741B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA9D2B42-D4B7-01F2-7387-6D0D0A92741B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA9D2B42-D4B7-01F2-7387-6D0D0A92741B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA9D2B42-D4B7-01F2-7387-6D0D0A92741B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8682E86-6D61-D1A4-AE58-3A985563222C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8682E86-6D61-D1A4-AE58-3A985563222C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8682E86-6D61-D1A4-AE58-3A985563222C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8682E86-6D61-D1A4-AE58-3A985563222C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
