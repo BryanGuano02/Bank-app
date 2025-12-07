@@ -107,3 +107,21 @@ dist/
 appsettings.Development.json
 
 *.drawio.bkp
+
+## Environment files
+.env
+.env.*
+
+## Local databases (SQLite)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+fastBankBD.db
+
+## Dotnet tool and artifact caches
+.dotnet/
+.dotnet_tool_restore/
+
+## IDE workspace files
+*.code-workspace
