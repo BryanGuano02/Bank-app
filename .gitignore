@@ -105,3 +105,5 @@ dist/
 
 # Ignore appsettings for local development
 appsettings.Development.json
+
+.drawio.bkp
