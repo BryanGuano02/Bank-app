@@ -1,4 +1,5 @@
 using Domain.Interfaces.States;
+using Domain.Patterns.State;
 using System;
 
 namespace Domain.Entities
@@ -20,7 +21,8 @@ namespace Domain.Entities
             NumeroCuenta = string.Empty;
             Saldo = 0m;
             FechaApertura = DateTime.UtcNow;
-            _estado = null!;
+            // Assign a sensible default state when EF materializes the entity
+            _estado = new EstadoCuentaActiva();
         }
 
         protected Cuenta(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)

@@ -84,6 +84,7 @@ namespace Fast_Bank.Infrastructure.Migrations
                     Monto = table.Column<decimal>(type: "TEXT", nullable: false),
                     Fecha = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Descripcion = table.Column<string>(type: "TEXT", nullable: false),
+                    Tipo = table.Column<string>(type: "TEXT", nullable: false),
                     OrigenNumeroCuenta = table.Column<string>(type: "TEXT", nullable: true),
                     DestinoNumeroCuenta = table.Column<string>(type: "TEXT", nullable: true)
                 },

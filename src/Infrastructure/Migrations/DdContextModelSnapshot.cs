@@ -115,6 +115,10 @@ namespace Fast_Bank.Infrastructure.Migrations
                     b.Property<string>("OrigenNumeroCuenta")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("IdMovimiento");
 
                     b.HasIndex("DestinoNumeroCuenta");

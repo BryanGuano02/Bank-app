@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fast_Bank.Infrastructure.Migrations
 {
     [DbContext(typeof(DdContext))]
-    [Migration("20251207184102_InitialCreate")]
+    [Migration("20251207215157_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -116,6 +116,10 @@ namespace Fast_Bank.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OrigenNumeroCuenta")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("IdMovimiento");

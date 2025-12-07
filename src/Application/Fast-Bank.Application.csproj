@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Fast-Bank.Domain.csproj" />
+    <ProjectReference Include="..\Infrastructure\Fast-Bank.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

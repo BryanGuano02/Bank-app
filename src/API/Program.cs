@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Fast_Bank.Infrastructure.Persistence;
+using Fast_Bank.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,18 +12,27 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<DdContext>(options =>
     options.UseSqlite(connectionString));
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Application services
+builder.Services.AddScoped<MovimientoService>();
+
+// Configure OpenAPI/Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fast-Bank API V1");
+        c.RoutePrefix = string.Empty; // serve swagger at app root (optional)
+    });
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
