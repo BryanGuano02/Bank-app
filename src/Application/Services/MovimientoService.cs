@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using System;
+using System.Threading.Tasks;
 using Domain.Entities;
-using Domain.Logic;
+using Domain.Services;
 using Fast_Bank.Infrastructure.Persistence;
 
 namespace Fast_Bank.Application.Services;
@@ -9,6 +11,7 @@ namespace Fast_Bank.Application.Services;
 public class MovimientoService
 {
     private readonly IDdContext _context;
+    private readonly Domain.Services.MovimientoService _domainMovimientoService = new();
 
     public MovimientoService(IDdContext context)
     {
@@ -23,12 +26,8 @@ public class MovimientoService
         var destino = await _context.Cuentas.FindAsync(numeroCuentaDestino);
         if (destino == null) throw new InvalidOperationException("Cuenta destino no encontrada.");
 
-        var movimiento = Movimiento.Create(Guid.NewGuid().ToString(), monto, null, destino, descripcion ?? string.Empty, new DepositoTipo());
+        var movimiento = _domainMovimientoService.CrearYEjecutarDeposito(Guid.NewGuid().ToString(), destino, monto, descripcion ?? string.Empty);
 
-        // Ejecutar la lógica del dominio (aplica el depósito en la entidad Cuenta)
-        movimiento.Ejecutar();
-
-        // Persistir movimiento y cambios en la cuenta
         await _context.Movimientos.AddAsync(movimiento);
         await _context.SaveChangesAsync();
 
