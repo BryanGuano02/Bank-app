@@ -21,6 +21,12 @@ public class MovimientosController : ControllerBase
         public decimal Monto { get; set; }
         public string? Descripcion { get; set; }
     }
+    public class RetiroRequest
+    {
+        public string NumeroCuentaOrigen { get; set; } = string.Empty;
+        public decimal Monto { get; set; }
+        public string? Descripcion { get; set; }
+    }
 
     [HttpPost("depositar")]
     public async Task<IActionResult> Depositar([FromBody] DepositoRequest req)
@@ -32,6 +38,26 @@ public class MovimientosController : ControllerBase
         var id = await _movimientoService.DepositarAsync(req.NumeroCuentaDestino, req.Monto, req.Descripcion ?? string.Empty);
 
         return CreatedAtAction(nameof(GetById), new { id }, new { IdMovimiento = id });
+    }
+
+    [HttpPost("retirar")]
+    public async Task<IActionResult> Retirar([FromBody] RetiroRequest req)
+    {
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen)) return BadRequest("NumeroCuentaOrigen es requerido.");
+        if (req.Monto <= 0) return BadRequest("Monto debe ser mayor que cero.");
+
+        try
+        {
+            var id = await _movimientoService.RetirarAsync(req.NumeroCuentaOrigen, req.Monto, req.Descripcion ?? string.Empty);
+
+            return CreatedAtAction(nameof(GetById), new { id }, new { IdMovimiento = id });
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Captura errores de negocio (saldo insuficiente, sobregiro excedido, cuenta bloqueada, etc.)
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
     // Minimal GET placeholder so CreatedAtAction has a target — implementation can be expanded.

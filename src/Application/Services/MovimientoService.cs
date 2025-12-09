@@ -33,5 +33,20 @@ public class MovimientoService
 
         return movimiento.IdMovimiento;
     }
+    public async Task<string> RetirarAsync(string numeroCuentaOrigen, decimal monto, string descripcion)
+    {
+        if (string.IsNullOrWhiteSpace(numeroCuentaOrigen)) throw new ArgumentException("Número de cuenta origen inválido.", nameof(numeroCuentaOrigen));
+        if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser mayor que cero.");
+
+        var origen = await _context.Cuentas.FindAsync(numeroCuentaOrigen);
+        if (origen == null) throw new InvalidOperationException("Cuenta origen no encontrada.");
+
+        var movimiento = _domainMovimientoService.CrearYEjecutarRetiro(Guid.NewGuid().ToString(), origen, monto, descripcion ?? string.Empty);
+
+        await _context.Movimientos.AddAsync(movimiento);
+        await _context.SaveChangesAsync();
+
+        return movimiento.IdMovimiento;
+    }
 }
 
