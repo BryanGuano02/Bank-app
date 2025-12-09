@@ -18,8 +18,12 @@ public class EstadoCuentaActiva : IEstadoCuenta
     {
         if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser positivo.");
 
-        // Aquí podríamos validar saldo insuficiente también
-        if (cuenta.Saldo < monto) throw new InvalidOperationException("Saldo insuficiente.");
+        // NO validar saldo aquí porque cada tipo de cuenta tiene sus propias reglas:
+        // - CuentaAhorros: no permite saldo negativo
+        // - CuentaCorriente: permite sobregiro hasta un límite
+        // La validación ya se hizo en CuentaAhorros.Retirar() o CuentaCorriente.Retirar()
+
+        // if (cuenta.Saldo < monto) throw new InvalidOperationException("Saldo insuficiente.");
 
         cuenta.ModificarSaldo(-monto);
     }
