@@ -24,6 +24,31 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// --- AGREGA ESTO ---
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // Reemplaza 'TuDbContext' con el nombre real de tu clase de contexto (ej: AppDbContext)
+        var context = services.GetRequiredService<DdContext>();
+
+        // Esto aplica las migraciones pendientes y crea la DB si no existe
+        context.Database.Migrate();
+
+        // OJO: Si NO usas migraciones de Entity Framework y solo usas el modelo,
+        // cambia la línea de arriba por: context.Database.EnsureCreated();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocurrió un error al migrar la base de datos.");
+    }
+}
+// -------------------
+
+// ... Aquí sigue tu app.UseSwagger(), etc.
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
