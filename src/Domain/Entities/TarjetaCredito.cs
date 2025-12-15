@@ -1,10 +1,9 @@
 using Domain.Interfaces.States;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities
 {
-    using System.ComponentModel.DataAnnotations;
-
     public class TarjetaCredito
     {
         [Key]
@@ -16,7 +15,12 @@ namespace Domain.Entities
         private IEstadoTarjeta _estado;
 
         // Constructor parameterless para EF Core
-        protected TarjetaCredito() { }
+        protected TarjetaCredito()
+        {
+            NumeroTarjeta = string.Empty;
+            Cliente = null!;
+            _estado = null!;
+        }
 
         public TarjetaCredito(string numeroTarjeta, decimal limiteCredito, Cliente cliente, IEstadoTarjeta estadoInicial)
         {
@@ -42,18 +46,14 @@ namespace Domain.Entities
             _estado = nuevoEstado;
         }
 
-        // Usado por el estado concreto para actualizar valores
         internal void AumentarDeuda(decimal monto) => SaldoPendiente += monto;
         internal void DisminuirDeuda(decimal monto) => SaldoPendiente -= monto;
 
-        // --- Delegación ---
         public void RealizarCompra(decimal monto)
         {
-            // Validaciones invariant del negocio antes del estado
             if (SaldoPendiente + monto > LimiteCredito)
                 throw new InvalidOperationException("Límite excedido");
 
-            // El estado decide si se permite la compra (ej: si está Bloqueada lanza error)
             _estado.RealizarCompra(this, monto);
         }
     }

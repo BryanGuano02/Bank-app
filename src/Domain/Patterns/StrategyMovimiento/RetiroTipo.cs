@@ -11,7 +11,7 @@ namespace Domain.Logic
         public void procesar(Movimiento movimiento)
         {
             validar(movimiento);
-            movimiento.Origen.Retirar(movimiento.Monto);
+            movimiento.Origen!.Retirar(movimiento.Monto);
         }
 
         public void validar(Movimiento movimiento)

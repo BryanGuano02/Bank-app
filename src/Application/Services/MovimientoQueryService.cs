@@ -42,8 +42,8 @@ namespace Fast_Bank.Application.Services
             var movimientos = await _context.Movimientos
                 .Include(m => m.Origen)
                 .Include(m => m.Destino)
-                .Where(m => m.Origen.NumeroCuenta == numeroCuenta || 
-                           m.Destino.NumeroCuenta == numeroCuenta)
+                .Where(m => (m.Origen != null && m.Origen.NumeroCuenta == numeroCuenta) || 
+                            m.Destino.NumeroCuenta == numeroCuenta)
                 .OrderByDescending(m => m.Fecha)
                 .ToListAsync();
 
