@@ -15,7 +15,8 @@ namespace Fast_Bank.Infrastructure.Migrations
                 table: "ControlEjecuciones",
                 type: "BLOB",
                 rowVersion: true,
-                nullable: true);
+                nullable: false,
+                defaultValue: new byte[0]);
         }
 
         /// <inheritdoc />

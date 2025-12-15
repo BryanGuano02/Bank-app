@@ -13,6 +13,6 @@ namespace Domain.Entities
         public DateTime UltimaEjecucion { get; set; }
         
         [Timestamp]
-        public byte[]? RowVersion { get; set; }
+        public byte[] RowVersion { get; set; } = Array.Empty<byte>();
     }
 }

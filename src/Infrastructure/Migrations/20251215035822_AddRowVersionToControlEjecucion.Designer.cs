@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fast_Bank.Infrastructure.Migrations
 {
     [DbContext(typeof(DdContext))]
-    [Migration("20251215035458_AddRowVersionToControlEjecucion")]
+    [Migration("20251215035822_AddRowVersionToControlEjecucion")]
     partial class AddRowVersionToControlEjecucion
     {
         /// <inheritdoc />
@@ -62,6 +62,7 @@ namespace Fast_Bank.Infrastructure.Migrations
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("BLOB");
 
