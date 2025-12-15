@@ -16,18 +16,26 @@ namespace Fast_Bank.Application.Services
         }
 
         public async Task<CuentaAhorros> CrearCuentaAhorrosAsync(
-            string numeroCuenta, 
-            decimal saldoInicial, 
+            string cedulaCliente,
+            string numeroCuenta,
+            decimal saldoInicial,
             double tasaInteres)
         {
+            if (string.IsNullOrWhiteSpace(cedulaCliente))
+                throw new ArgumentException("Cédula inválida.", nameof(cedulaCliente));
+
             if (string.IsNullOrWhiteSpace(numeroCuenta))
                 throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
+
+            var cliente = await _context.Clientes.FindAsync(cedulaCliente);
+            if (cliente == null)
+                throw new InvalidOperationException("Cliente no encontrado.");
 
             var existente = await _context.Cuentas.FindAsync(numeroCuenta);
             if (existente != null)
                 throw new InvalidOperationException("La cuenta ya existe.");
 
-            var cuenta = CuentaAhorros.Create(
+            var cuenta = cliente.CrearCuentaAhorros(
                 numeroCuenta,
                 saldoInicial,
                 tasaInteres,
@@ -41,18 +49,26 @@ namespace Fast_Bank.Application.Services
         }
 
         public async Task<CuentaCorriente> CrearCuentaCorrienteAsync(
-            string numeroCuenta, 
-            decimal saldoInicial, 
+            string cedulaCliente,
+            string numeroCuenta,
+            decimal saldoInicial,
             decimal limiteSobregiro)
         {
+            if (string.IsNullOrWhiteSpace(cedulaCliente))
+                throw new ArgumentException("Cédula inválida.", nameof(cedulaCliente));
+
             if (string.IsNullOrWhiteSpace(numeroCuenta))
                 throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
+
+            var cliente = await _context.Clientes.FindAsync(cedulaCliente);
+            if (cliente == null)
+                throw new InvalidOperationException("Cliente no encontrado.");
 
             var existente = await _context.Cuentas.FindAsync(numeroCuenta);
             if (existente != null)
                 throw new InvalidOperationException("La cuenta ya existe.");
 
-            var cuenta = CuentaCorriente.Create(
+            var cuenta = cliente.CrearCuentaCorriente(
                 numeroCuenta,
                 saldoInicial,
                 limiteSobregiro,

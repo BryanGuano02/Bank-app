@@ -15,6 +15,12 @@ namespace Domain.Entities
 
         private IEstadoCuenta _estado;
 
+        // Navigation to the owning cliente (optional)
+        public Cliente? Cliente { get; private set; }
+
+        // Foreign key property for the one-to-one relationship with Cliente
+        public string? ClienteCedula { get; private set; }
+
         // Parameterless constructor for EF Core
         protected Cuenta()
         {
@@ -31,6 +37,12 @@ namespace Domain.Entities
             Saldo = saldoInicial;
             FechaApertura = DateTime.UtcNow;
             _estado = estadoInicial;
+        }
+
+        internal void SetCliente(Cliente cliente)
+        {
+            Cliente = cliente ?? throw new ArgumentNullException(nameof(cliente));
+            ClienteCedula = cliente.Cedula;
         }
 
         public void CambiarEstado(IEstadoCuenta nuevoEstado)

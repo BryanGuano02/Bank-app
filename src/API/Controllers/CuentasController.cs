@@ -8,67 +8,111 @@ namespace Fast_Bank.API.Controllers;
 [Route("api/[controller]")]
 public class CuentasController : ControllerBase
 {
-    private readonly CuentaService _cuentaService;
     private readonly CuentaQueryService _cuentaQueryService;
+    private readonly MovimientoService _movimientoService;
 
-    public CuentasController(
-        CuentaService cuentaService,
-        CuentaQueryService cuentaQueryService)
+    public CuentasController(CuentaQueryService cuentaQueryService, MovimientoService movimientoService)
     {
-        _cuentaService = cuentaService;
         _cuentaQueryService = cuentaQueryService;
+        _movimientoService = movimientoService;
     }
 
-    // DTO para Cuenta de Ahorros
-    public class CrearCuentaAhorrosRequest
+    // DTOs para operaciones de movimientos (delegadas a MovimientoService)
+    public class DepositoRequest
     {
-        public string NumeroCuenta { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
-        
-        /// <summary>
-        /// Tasa de inter�s anual en formato decimal.
-        /// </summary>
-        public double TasaInteres { get; set; } = 2;
+        public string NumeroCuentaDestino { get; set; } = string.Empty;
+        public decimal Monto { get; set; }
+        public string? Descripcion { get; set; }
     }
 
-    // DTO para Cuenta Corriente
-    public class CrearCuentaCorrienteRequest
+    public class RetiroRequest
     {
-        public string NumeroCuenta { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
-        public decimal LimiteSobregiro { get; set; } = 500;
+        public string NumeroCuentaOrigen { get; set; } = string.Empty;
+        public decimal Monto { get; set; }
+        public string? Descripcion { get; set; }
+    }
+
+    public class TransferenciaRequest
+    {
+        public string NumeroCuentaOrigen { get; set; } = string.Empty;
+        public string NumeroCuentaDestino { get; set; } = string.Empty;
+        public decimal Monto { get; set; }
+        public string? Descripcion { get; set; }
     }
 
     /// <summary>
-    /// Crear una nueva cuenta de ahorros
+    /// Realizar un depósito (mueve desde MovimientosController)
     /// </summary>
-    [HttpPost("ahorros")]
-    public async Task<IActionResult> CrearCuentaAhorros([FromBody] CrearCuentaAhorrosRequest req)
+    [HttpPost("depositar")]
+    public async Task<IActionResult> Depositar([FromBody] DepositoRequest req)
     {
         if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.NumeroCuenta))
-            return BadRequest("NumeroCuenta es requerido.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaDestino))
+            return BadRequest("NumeroCuentaDestino es requerido.");
+        if (req.Monto <= 0)
+            return BadRequest("Monto debe ser mayor que cero.");
+
+        var id = await _movimientoService.DepositarAsync(
+            req.NumeroCuentaDestino,
+            req.Monto,
+            req.Descripcion ?? string.Empty);
+
+        return CreatedAtAction(nameof(MovimientosController.GetById), "Movimientos", new { id }, new { IdMovimiento = id });
+    }
+
+    /// <summary>
+    /// Realizar un retiro (mueve desde MovimientosController)
+    /// </summary>
+    [HttpPost("retirar")]
+    public async Task<IActionResult> Retirar([FromBody] RetiroRequest req)
+    {
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen))
+            return BadRequest("NumeroCuentaOrigen es requerido.");
+        if (req.Monto <= 0)
+            return BadRequest("Monto debe ser mayor que cero.");
 
         try
         {
-            var cuenta = await _cuentaService.CrearCuentaAhorrosAsync(
-                req.NumeroCuenta,
-                req.SaldoInicial,
-                req.TasaInteres
-            );
-
-            return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                TipoCuenta = "Ahorros",
-                SaldoInicial = req.SaldoInicial,
-                TasaInteres = req.TasaInteres,
-                FechaApertura = cuenta.FechaApertura
-            });
+            var id = await _movimientoService.RetirarAsync(
+                req.NumeroCuentaOrigen,
+                req.Monto,
+                req.Descripcion ?? string.Empty);
+            return CreatedAtAction(nameof(MovimientosController.GetById), "Movimientos", new { id }, new { IdMovimiento = id });
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(new { error = ex.Message });
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Realizar una transferencia (mueve desde MovimientosController)
+    /// </summary>
+    [HttpPost("transferir")]
+    public async Task<IActionResult> Transferir([FromBody] TransferenciaRequest req)
+    {
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen))
+            return BadRequest("NumeroCuentaOrigen es requerido.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaDestino))
+            return BadRequest("NumeroCuentaDestino es requerido.");
+        if (req.Monto <= 0)
+            return BadRequest("Monto debe ser mayor que cero.");
+
+        try
+        {
+            var id = await _movimientoService.TransferirAsync(
+                req.NumeroCuentaOrigen,
+                req.NumeroCuentaDestino,
+                req.Monto,
+                req.Descripcion ?? string.Empty);
+            return CreatedAtAction(nameof(MovimientosController.GetById), "Movimientos", new { id },
+                new { IdMovimiento = id, Mensaje = "Transferencia completada exitosamente." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
         }
         catch (ArgumentException ex)
         {
@@ -76,42 +120,7 @@ public class CuentasController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Crear una nueva cuenta corriente
-    /// </summary>
-    [HttpPost("corriente")]
-    public async Task<IActionResult> CrearCuentaCorriente([FromBody] CrearCuentaCorrienteRequest req)
-    {
-        if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.NumeroCuenta))
-            return BadRequest("NumeroCuenta es requerido.");
-
-        try
-        {
-            var cuenta = await _cuentaService.CrearCuentaCorrienteAsync(
-                req.NumeroCuenta,
-                req.SaldoInicial,
-                req.LimiteSobregiro
-            );
-
-            return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                TipoCuenta = "Corriente",
-                SaldoInicial = req.SaldoInicial,
-                LimiteSobregiro = req.LimiteSobregiro,
-                FechaApertura = cuenta.FechaApertura
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { error = ex.Message });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
+    // La creación de cuentas ahora se realiza vía `ClienteController`.
 
     /// <summary>
     /// Consultar una cuenta por n�mero
@@ -120,7 +129,7 @@ public class CuentasController : ControllerBase
     public async Task<IActionResult> Get(string numero)
     {
         var cuenta = await _cuentaQueryService.ObtenerPorNumeroAsync(numero);
-        
+
         if (cuenta == null)
             return NotFound(new { error = "Cuenta no encontrada." });
 

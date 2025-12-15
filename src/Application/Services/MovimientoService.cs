@@ -1,21 +1,20 @@
 using System;
 using System.Threading.Tasks;
-using System;
-using System.Threading.Tasks;
 using Domain.Entities;
-using Domain.Services;
 using Fast_Bank.Infrastructure.Persistence;
+using DomainMovimientoService = Domain.Services.MovimientoService;
 
 namespace Fast_Bank.Application.Services;
 
 public class MovimientoService
 {
     private readonly IDdContext _context;
-    private readonly Domain.Services.MovimientoService _domainMovimientoService = new();
+    private readonly DomainMovimientoService _domainMovimientoService;
 
-    public MovimientoService(IDdContext context)
+    public MovimientoService(IDdContext context, DomainMovimientoService domainMovimientoService)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _domainMovimientoService = domainMovimientoService ?? throw new ArgumentNullException(nameof(domainMovimientoService));
     }
 
     public async Task<string> DepositarAsync(string numeroCuentaDestino, decimal monto, string descripcion)
@@ -33,7 +32,7 @@ public class MovimientoService
 
         return movimiento.IdMovimiento;
     }
-    
+
     public async Task<string> RetirarAsync(string numeroCuentaOrigen, decimal monto, string descripcion)
     {
         if (string.IsNullOrWhiteSpace(numeroCuentaOrigen)) throw new ArgumentException("Número de cuenta origen inválido.", nameof(numeroCuentaOrigen));

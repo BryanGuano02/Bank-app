@@ -31,6 +31,12 @@ namespace Fast_Bank.Infrastructure.Persistence
                     .HasValue<CuentaCorriente>("Corriente");
             });
 
+            // Configurar relación uno-a-uno entre Cliente y Cuenta especificando la FK
+            modelBuilder.Entity<Cliente>()
+                .HasOne(c => c.Cuenta)
+                .WithOne(cu => cu.Cliente)
+                .HasForeignKey<Cuenta>(cu => cu.ClienteCedula);
+
             // Registrar las entidades concretas para asegurarnos que EF Core las descubre
             modelBuilder.Entity<CuentaAhorros>();
             modelBuilder.Entity<CuentaCorriente>();

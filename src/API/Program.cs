@@ -22,6 +22,10 @@ builder.Services.AddScoped<MovimientoQueryService>();
 builder.Services.AddScoped<CuentaService>();
 builder.Services.AddScoped<CuentaQueryService>();
 builder.Services.AddScoped<InteresesService>();
+builder.Services.AddScoped<ClienteService>();
+// Domain services (used by application services)
+builder.Services.AddScoped<Domain.Services.MovimientoService>();
+builder.Services.AddScoped<Domain.Services.ClienteService>();
 
 builder.Services.AddHostedService<InteresesBackgroundService>();
 
@@ -37,7 +41,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILogger<Program>>();
-    
+
     try
     {
         var context = services.GetRequiredService<DdContext>();
