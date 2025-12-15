@@ -16,7 +16,7 @@ namespace Fast_Bank.Infrastructure.Migrations
                 type: "BLOB",
                 rowVersion: true,
                 nullable: false,
-                defaultValue: new byte[0]);
+                defaultValue: System.Array.Empty<byte>());
         }
 
         /// <inheritdoc />
