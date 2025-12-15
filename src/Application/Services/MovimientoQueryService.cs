@@ -47,7 +47,7 @@ namespace Fast_Bank.Application.Services
                 .OrderByDescending(m => m.Fecha)
                 .ToListAsync();
 
-            return movimientos.Select(m => MapToDtoConContext(m, numeroCuenta));
+            return movimientos.Select(MapToDto);
         }
 
         private static MovimientoDto MapToDto(Movimiento movimiento)
@@ -63,14 +63,6 @@ namespace Fast_Bank.Application.Services
                 CuentaDestino = movimiento.Destino?.NumeroCuenta
             };
         }
-
-        private static MovimientoDto MapToDtoConContext(Movimiento movimiento, string numeroCuenta)
-        {
-            var dto = MapToDto(movimiento);
-            dto.EsDebito = movimiento.Origen?.NumeroCuenta == numeroCuenta;
-            dto.EsCredito = movimiento.Destino?.NumeroCuenta == numeroCuenta;
-            return dto;
-        }
     }
 
     // DTO
@@ -83,7 +75,5 @@ namespace Fast_Bank.Application.Services
         public string Descripcion { get; set; } = string.Empty;
         public string? CuentaOrigen { get; set; }
         public string? CuentaDestino { get; set; }
-        public bool EsDebito { get; set; }
-        public bool EsCredito { get; set; }
     }
 }
