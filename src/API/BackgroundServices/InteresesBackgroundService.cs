@@ -105,22 +105,34 @@ namespace Fast_Bank.API.BackgroundServices
                     resultado.MontoTotalAcreditado,
                     resultado.CuentasOmitidas);
 
-                // Actualizar o crear el registro de control
-                if (control == null)
+                try
                 {
-                    control = new Domain.Entities.ControlEjecucion
+                    // Actualizar o crear el registro de control
+                    if (control == null)
                     {
-                        Proceso = "AcreditacionInteresesMensuales",
-                        UltimaEjecucion = ahora
-                    };
-                    await context.ControlEjecuciones.AddAsync(control);
-                }
-                else
-                {
-                    control.UltimaEjecucion = ahora;
-                }
+                        control = new Domain.Entities.ControlEjecucion
+                        {
+                            Proceso = "AcreditacionInteresesMensuales",
+                            UltimaEjecucion = ahora
+                        };
+                        await context.ControlEjecuciones.AddAsync(control);
+                    }
+                    else
+                    {
+                        control.UltimaEjecucion = ahora;
+                    }
 
-                await context.SaveChangesAsync();
+                    await context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    // Otra instancia actualizó el registro primero - esto es esperado en escenarios de múltiples instancias
+                    _logger.LogInformation(
+                        "Otra instancia del servicio ya acreditó los intereses para {Year}-{Month}. " +
+                        "Los intereses procesados por esta instancia no se duplicarán.",
+                        ahora.Year, ahora.Month);
+                    // No relanzar la excepción - esto es el comportamiento esperado con optimistic concurrency
+                }
             }
         }
 

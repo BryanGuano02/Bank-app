@@ -11,5 +11,8 @@ namespace Domain.Entities
         public string Proceso { get; set; } = string.Empty;
         
         public DateTime UltimaEjecucion { get; set; }
+        
+        [Timestamp]
+        public byte[]? RowVersion { get; set; }
     }
 }
