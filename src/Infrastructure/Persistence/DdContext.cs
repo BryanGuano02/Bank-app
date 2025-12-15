@@ -18,6 +18,7 @@ namespace Fast_Bank.Infrastructure.Persistence
         public DbSet<CuentaCorriente> CuentasCorrientes { get; set; }
         public DbSet<TarjetaCredito> TarjetasCredito { get; set; }
         public DbSet<EntidadFinanciera> EntidadesFinancieras { get; set; }
+        public DbSet<ControlEjecucion> ControlEjecuciones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

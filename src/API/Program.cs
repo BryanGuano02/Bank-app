@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Fast_Bank.Infrastructure.Persistence;
 using Fast_Bank.Application.Services;
+using Fast_Bank.API.BackgroundServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddScoped<IDdContext>(sp => sp.GetRequiredService<DdContext>())
 
 // Application services
 builder.Services.AddScoped<MovimientoService>();
+builder.Services.AddScoped<InteresesService>();
+
+builder.Services.AddHostedService<InteresesBackgroundService>();
 
 // Configure OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -28,6 +32,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
     try
     {
         var context = services.GetRequiredService<DdContext>();
@@ -35,11 +41,11 @@ using (var scope = app.Services.CreateScope())
         // Aplicar migraciones pendientes y crear la BD si no existe
         context.Database.Migrate();
 
-        Console.WriteLine("✅ Base de datos creada/actualizada exitosamente");
+        logger.LogInformation("Base de datos creada/actualizada exitosamente");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Error al crear la base de datos: {ex.Message}");
+        logger.LogError(ex, "Error al crear la base de datos");
         throw;
     }
 }
