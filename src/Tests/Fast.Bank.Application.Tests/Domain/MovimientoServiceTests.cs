@@ -288,5 +288,238 @@ namespace Fast.Bank.Application.Tests.Domain
         }
 
         #endregion
+
+        #region Tests de Transferencia
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_ConDatosValidos_DebeTransferirSaldoEntreCuentas()
+        {
+            // Arrange - CA1: La cuenta origen y la cuenta destino deben existir
+            var saldoInicialOrigen = 1000m;
+            var saldoInicialDestino = 500m;
+            var montoTransferencia = 300m;
+            var cuentaOrigen = new CuentaAhorros("12345", saldoInicialOrigen, 0.01, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", saldoInicialDestino, 0.01, new EstadoCuentaActiva());
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia de prueba";
+
+            // Act
+            var movimiento = _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion);
+
+            // Assert
+            Assert.NotNull(movimiento);
+            Assert.Equal(idMovimiento, movimiento.IdMovimiento);
+            Assert.Equal(montoTransferencia, movimiento.Monto);
+            Assert.Equal(saldoInicialOrigen - montoTransferencia, cuentaOrigen.Saldo);
+            Assert.Equal(saldoInicialDestino + montoTransferencia, cuentaDestino.Saldo);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_ConCuentaOrigenNula_DebeLanzarArgumentNullException()
+        {
+            // Arrange - CA1: La cuenta origen debe existir
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var montoTransferencia = 100m;
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia de prueba";
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentNullException>(() =>
+                _movimientoService.CrearYEjecutarTransferencia(idMovimiento, null, cuentaDestino, montoTransferencia, descripcion)
+            );
+            Assert.Equal("origen", exception.ParamName);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_ConCuentaDestinoNula_DebeLanzarArgumentNullException()
+        {
+            // Arrange - CA1: La cuenta destino debe existir
+            var cuentaOrigen = new CuentaAhorros("12345", 1000m, 0.01, new EstadoCuentaActiva());
+            var montoTransferencia = 100m;
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia de prueba";
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentNullException>(() =>
+                _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, null, montoTransferencia, descripcion)
+            );
+            Assert.Equal("destino", exception.ParamName);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void CrearYEjecutarTransferencia_ConIdMovimientoInvalido_DebeLanzarArgumentException(string idMovimiento)
+        {
+            // Arrange
+            var cuentaOrigen = new CuentaAhorros("12345", 1000m, 0.01, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var montoTransferencia = 100m;
+            var descripcion = "Transferencia de prueba";
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() =>
+                _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion)
+            );
+            Assert.Equal("IdMovimiento inválido. (Parameter 'idMovimiento')", exception.Message);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-100)]
+        public void CrearYEjecutarTransferencia_ConMontoInvalido_DebeLanzarArgumentOutOfRangeException(decimal monto)
+        {
+            // Arrange
+            var cuentaOrigen = new CuentaAhorros("12345", 1000m, 0.01, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia de prueba";
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, monto, descripcion)
+            );
+            Assert.Equal("monto", exception.ParamName);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_ConMontoMayorAlPermitido_DebeLanzarInvalidOperationException()
+        {
+            // Arrange - CA3: El monto máximo permitido por transferencia es 5000
+            var cuentaOrigen = new CuentaAhorros("12345", 10000m, 0.01, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var montoExcesivo = 5001m; // El límite es 5000
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia de prueba";
+
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoExcesivo, descripcion)
+            );
+            Assert.Contains("El monto excede el máximo permitido por movimiento", exception.Message);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_CuentaAhorrosOrigen_ConSaldoInsuficiente_DebeLanzarInvalidOperationException()
+        {
+            // Arrange - CA4: Para cuenta de ahorros, no se permite dejar saldo negativo
+            var saldoInicialOrigen = 500m;
+            var montoTransferencia = 600m; // Más que el saldo
+            var cuentaOrigen = new CuentaAhorros("12345", saldoInicialOrigen, 0.01, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia de prueba";
+
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion)
+            );
+            Assert.Equal("Fondos insuficientes.", exception.Message);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_CuentaCorrienteOrigen_DentroDeLimiteSobregiro_DebePermitirTransferencia()
+        {
+            // Arrange - CA4: Para cuenta corriente, se permite sobregiro hasta el límite configurado
+            var saldoInicialOrigen = 500m;
+            var limiteSobregiro = 1000m;
+            var montoTransferencia = 800m; // Mayor que el saldo, pero dentro del límite de sobregiro
+            var cuentaOrigen = new CuentaCorriente("12345", saldoInicialOrigen, limiteSobregiro, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia con sobregiro";
+
+            // Act
+            var movimiento = _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion);
+
+            // Assert
+            Assert.NotNull(movimiento);
+            Assert.Equal(saldoInicialOrigen - montoTransferencia, cuentaOrigen.Saldo); // Saldo negativo
+            Assert.True(cuentaOrigen.Saldo < 0); // Confirmar que el saldo es negativo
+            Assert.True(cuentaOrigen.Saldo >= -limiteSobregiro); // Pero dentro del límite
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_CuentaCorrienteOrigen_ExcedeLimiteSobregiro_DebeLanzarInvalidOperationException()
+        {
+            // Arrange - CA4: El sobregiro tiene un límite
+            var saldoInicialOrigen = 500m;
+            var limiteSobregiro = 1000m;
+            var montoTransferencia = 2000m; // Excede saldo + sobregiro (500 + 1000 = 1500)
+            var cuentaOrigen = new CuentaCorriente("12345", saldoInicialOrigen, limiteSobregiro, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia excesiva";
+
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion)
+            );
+            Assert.Equal("Excede límite de sobregiro.", exception.Message);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_VerificarTipoDeMovimiento_DebeSerTransferencia()
+        {
+            // Arrange - CA5: El movimiento debe registrarse con fecha, monto, tipo y cuenta destino
+            var cuentaOrigen = new CuentaAhorros("12345", 1000m, 0.01, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var montoTransferencia = 200m;
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia de prueba";
+
+            // Act
+            var movimiento = _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion);
+
+            // Assert
+            Assert.Equal("TRANSFERENCIA", movimiento.Tipo);
+            Assert.Equal(cuentaOrigen, movimiento.Origen);
+            Assert.Equal(cuentaDestino, movimiento.Destino);
+            Assert.Equal(montoTransferencia, movimiento.Monto);
+            Assert.NotEqual(default(DateTime), movimiento.Fecha);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_EntreDosCuentasAhorros_DebeManipularAmbosUsuarios()
+        {
+            // Arrange - Escenario realista: Juan transfiere a María
+            var saldoJuan = 2000m;
+            var saldoMaria = 1500m;
+            var montoTransferencia = 750m;
+            var cuentaJuan = new CuentaAhorros("JUAN-001", saldoJuan, 0.02, new EstadoCuentaActiva());
+            var cuentaMaria = new CuentaAhorros("MARIA-001", saldoMaria, 0.02, new EstadoCuentaActiva());
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Pago de alquiler";
+
+            // Act
+            var movimiento = _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaJuan, cuentaMaria, montoTransferencia, descripcion);
+
+            // Assert
+            Assert.Equal(2000m - 750m, cuentaJuan.Saldo);     // Juan queda con 1250
+            Assert.Equal(1500m + 750m, cuentaMaria.Saldo);    // María queda con 2250
+            Assert.Equal("Pago de alquiler", movimiento.Descripcion);
+        }
+
+        [Fact]
+        public void CrearYEjecutarTransferencia_TransferirTodoElSaldo_DebeDejaSaldoOrigenEnCero()
+        {
+            // Arrange - Caso borde: transferir exactamente todo el saldo
+            var saldoInicialOrigen = 1000m;
+            var montoTransferencia = 1000m;
+            var cuentaOrigen = new CuentaAhorros("12345", saldoInicialOrigen, 0.01, new EstadoCuentaActiva());
+            var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+            var idMovimiento = Guid.NewGuid().ToString();
+            var descripcion = "Transferencia total";
+
+            // Act
+            var movimiento = _movimientoService.CrearYEjecutarTransferencia(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion);
+
+            // Assert
+            Assert.Equal(0m, cuentaOrigen.Saldo);
+            Assert.Equal(500m + 1000m, cuentaDestino.Saldo);
+        }
+
+        #endregion
     }
 }

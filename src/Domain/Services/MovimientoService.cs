@@ -41,5 +41,24 @@ namespace Domain.Services
 
             return movimiento;
         }
+
+        // Crea y ejecuta la lógica de una transferencia. No persiste ni accede a la BD.
+        public Movimiento CrearYEjecutarTransferencia(string idMovimiento, Cuenta origen, Cuenta destino, decimal monto, string descripcion)
+        {
+            if (origen == null) throw new ArgumentNullException(nameof(origen));
+            if (destino == null) throw new ArgumentNullException(nameof(destino));
+            if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.", nameof(idMovimiento));
+
+            var movimiento = Movimiento.Create(idMovimiento, monto, origen, destino, descripcion ?? string.Empty, new TransferenciaTipo());
+
+            // Ejecuta la estrategia (modifica ambas cuentas en memoria)
+            // La validación se hace en:
+            // 1. TransferenciaTipo.validar() - valida monto máximo (5000), cuentas existentes
+            // 2. Cuenta.Retirar() en origen - valida saldo/sobregiro según tipo de cuenta
+            // 3. Cuenta.Depositar() en destino - acredita el monto
+            movimiento.Ejecutar();
+
+            return movimiento;
+        }
     }
 }

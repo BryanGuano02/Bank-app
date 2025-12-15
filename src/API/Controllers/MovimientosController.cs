@@ -21,9 +21,18 @@ public class MovimientosController : ControllerBase
         public decimal Monto { get; set; }
         public string? Descripcion { get; set; }
     }
+    
     public class RetiroRequest
     {
         public string NumeroCuentaOrigen { get; set; } = string.Empty;
+        public decimal Monto { get; set; }
+        public string? Descripcion { get; set; }
+    }
+
+    public class TransferenciaRequest
+    {
+        public string NumeroCuentaOrigen { get; set; } = string.Empty;
+        public string NumeroCuentaDestino { get; set; } = string.Empty;
         public decimal Monto { get; set; }
         public string? Descripcion { get; set; }
     }
@@ -56,6 +65,31 @@ public class MovimientosController : ControllerBase
         catch (InvalidOperationException ex)
         {
             // Captura errores de negocio (saldo insuficiente, sobregiro excedido, cuenta bloqueada, etc.)
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpPost("transferir")]
+    public async Task<IActionResult> Transferir([FromBody] TransferenciaRequest req)
+    {
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen)) return BadRequest("NumeroCuentaOrigen es requerido.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaDestino)) return BadRequest("NumeroCuentaDestino es requerido.");
+        if (req.Monto <= 0) return BadRequest("Monto debe ser mayor que cero.");
+
+        try
+        {
+            var id = await _movimientoService.TransferirAsync(req.NumeroCuentaOrigen, req.NumeroCuentaDestino, req.Monto, req.Descripcion ?? string.Empty);
+
+            return CreatedAtAction(nameof(GetById), new { id }, new { IdMovimiento = id, Mensaje = "Transferencia completada exitosamente." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Captura errores de negocio (saldo insuficiente, sobregiro excedido, cuenta bloqueada, cuentas inexistentes, etc.)
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
             return BadRequest(new { error = ex.Message });
         }
     }
