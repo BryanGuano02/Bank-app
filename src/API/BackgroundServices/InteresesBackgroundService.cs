@@ -31,8 +31,12 @@ namespace Fast_Bank.API.BackgroundServices
             {
                 var ahora = DateTime.UtcNow;
                 
-                // Calcular cuánto tiempo falta para las 00:01 del día siguiente
-                var proximaEjecucion = ahora.Date.AddDays(1).AddMinutes(1);
+                // Calcular la próxima ejecución a las 00:01 UTC
+                // Si aún no son las 00:01 de hoy, ejecutar hoy. Si no, ejecutar mañana.
+                var horaObjetivo = ahora.Date.AddMinutes(1); // 00:01 de hoy
+                var proximaEjecucion = ahora <= horaObjetivo 
+                    ? horaObjetivo 
+                    : horaObjetivo.AddDays(1); // 00:01 del día siguiente
                 var tiempoEspera = proximaEjecucion - ahora;
 
                 _logger.LogInformation("Próxima verificación programada para: {ProximaEjecucion} UTC (en {Horas}h {Minutos}m)",
