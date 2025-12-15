@@ -82,50 +82,64 @@ namespace Fast_Bank.API.BackgroundServices
             {
                 var context = scope.ServiceProvider.GetRequiredService<DdContext>();
                 
-                // Buscar el registro de control en la BD
-                var control = await context.ControlEjecuciones
-                    .FirstOrDefaultAsync(c => c.Proceso == "AcreditacionInteresesMensuales");
-
-                if (control != null && 
-                    control.UltimaEjecucion.Year == ahora.Year && 
-                    control.UltimaEjecucion.Month == ahora.Month)
+                try
                 {
-                    _logger.LogInformation("Intereses ya acreditados este mes ({Year}-{Month})", 
-                        ahora.Year, ahora.Month);
-                    return;
-                }
+                    // Buscar el registro de control en la BD
+                    var control = await context.ControlEjecuciones
+                        .FirstOrDefaultAsync(c => c.Proceso == "AcreditacionInteresesMensuales");
 
-                _logger.LogInformation("Iniciando acreditación automática de intereses mensuales para {Year}-{Month}", 
-                    ahora.Year, ahora.Month);
-
-                var interesesService = scope.ServiceProvider.GetRequiredService<InteresesService>();
-                var resultado = await interesesService.AcreditarInteresesMensualesAsync();
-
-                _logger.LogInformation(
-                    "Intereses acreditados exitosamente:\n" +
-                    "   Cuentas procesadas: {CuentasProcesadas}\n" +
-                    "   Monto total: ${MontoTotal:N2}\n" +
-                    "   Cuentas omitidas: {CuentasOmitidas}",
-                    resultado.CuentasProcesadas,
-                    resultado.MontoTotalAcreditado,
-                    resultado.CuentasOmitidas);
-
-                // Actualizar o crear el registro de control
-                if (control == null)
-                {
-                    control = new Domain.Entities.ControlEjecucion
+                    if (control != null && 
+                        control.UltimaEjecucion.Year == ahora.Year && 
+                        control.UltimaEjecucion.Month == ahora.Month)
                     {
-                        Proceso = "AcreditacionInteresesMensuales",
-                        UltimaEjecucion = ahora
-                    };
-                    await context.ControlEjecuciones.AddAsync(control);
-                }
-                else
-                {
-                    control.UltimaEjecucion = ahora;
-                }
+                        _logger.LogInformation("Intereses ya acreditados este mes ({Year}-{Month})", 
+                            ahora.Year, ahora.Month);
+                        return;
+                    }
 
-                await context.SaveChangesAsync();
+                    // Intentar actualizar el registro de control PRIMERO para adquirir el "lock" optimista
+                    if (control == null)
+                    {
+                        control = new Domain.Entities.ControlEjecucion
+                        {
+                            Proceso = "AcreditacionInteresesMensuales",
+                            UltimaEjecucion = ahora
+                        };
+                        await context.ControlEjecuciones.AddAsync(control);
+                    }
+                    else
+                    {
+                        control.UltimaEjecucion = ahora;
+                    }
+
+                    // Guardar ANTES de acreditar intereses - esto actúa como un lock optimista
+                    await context.SaveChangesAsync();
+
+                    // Solo si llegamos aquí (SaveChanges exitoso), procedemos a acreditar
+                    _logger.LogInformation("Iniciando acreditación automática de intereses mensuales para {Year}-{Month}", 
+                        ahora.Year, ahora.Month);
+
+                    var interesesService = scope.ServiceProvider.GetRequiredService<InteresesService>();
+                    var resultado = await interesesService.AcreditarInteresesMensualesAsync();
+
+                    _logger.LogInformation(
+                        "Intereses acreditados exitosamente:\n" +
+                        "   Cuentas procesadas: {CuentasProcesadas}\n" +
+                        "   Monto total: ${MontoTotal:N2}\n" +
+                        "   Cuentas omitidas: {CuentasOmitidas}",
+                        resultado.CuentasProcesadas,
+                        resultado.MontoTotalAcreditado,
+                        resultado.CuentasOmitidas);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    // Otra instancia actualizó el registro de control primero
+                    // Los intereses NO se acreditan en esta instancia ya que fallamos antes del procesamiento
+                    _logger.LogInformation(
+                        "Otra instancia del servicio está procesando o ya procesó los intereses para {Year}-{Month}. " +
+                        "Esta instancia no duplicará la acreditación.",
+                        ahora.Year, ahora.Month);
+                }
             }
         }
 
