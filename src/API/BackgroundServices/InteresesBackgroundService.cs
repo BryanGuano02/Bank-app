@@ -33,6 +33,7 @@ namespace Fast_Bank.API.BackgroundServices
                 
                 // Calcular la próxima ejecución a las 00:01 UTC
                 // Si aun no son las 00:01 de hoy, ejecutar hoy. Si no, ejecutar mañana.
+                // Usamos < (no <=) para evitar re-ejecución inmediata si ahora es exactamente 00:01
                 var horaObjetivo = ahora.Date.AddMinutes(1); // 00:01 de hoy
                 var proximaEjecucion = ahora < horaObjetivo 
                     ? horaObjetivo 
