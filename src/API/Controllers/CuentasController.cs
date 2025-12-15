@@ -26,10 +26,9 @@ public class CuentasController : ControllerBase
         public decimal SaldoInicial { get; set; }
         
         /// <summary>
-        /// Tasa de interés anual en formato decimal.
-        /// Ejemplo: 0.02 = 2%, 0.12 = 12%, 0.05 = 5%
+        /// Tasa de interï¿½s anual en formato decimal.
         /// </summary>
-        public double TasaInteres { get; set; } = 0.02;
+        public double TasaInteres { get; set; } = 2;
     }
 
     // DTO para Cuenta Corriente
@@ -115,7 +114,7 @@ public class CuentasController : ControllerBase
     }
 
     /// <summary>
-    /// Consultar una cuenta por número
+    /// Consultar una cuenta por nï¿½mero
     /// </summary>
     [HttpGet("{numero}")]
     public async Task<IActionResult> Get(string numero)
