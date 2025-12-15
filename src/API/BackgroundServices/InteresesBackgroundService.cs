@@ -32,9 +32,9 @@ namespace Fast_Bank.API.BackgroundServices
                 var ahora = DateTime.UtcNow;
                 
                 // Calcular la próxima ejecución a las 00:01 UTC
-                // Si aún no son las 00:01 de hoy, ejecutar hoy. Si no, ejecutar mañana.
+                // Si aun no son las 00:01 de hoy, ejecutar hoy. Si no, ejecutar mañana.
                 var horaObjetivo = ahora.Date.AddMinutes(1); // 00:01 de hoy
-                var proximaEjecucion = ahora <= horaObjetivo 
+                var proximaEjecucion = ahora < horaObjetivo 
                     ? horaObjetivo 
                     : horaObjetivo.AddDays(1); // 00:01 del día siguiente
                 var tiempoEspera = proximaEjecucion - ahora;
