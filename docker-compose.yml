@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  fast-bank-api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./data:/app/data
+    container_name: fast-bank-api

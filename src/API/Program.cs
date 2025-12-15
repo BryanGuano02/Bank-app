@@ -31,6 +31,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
 // Create or update the database at startup
 using (var scope = app.Services.CreateScope())
 {
@@ -52,6 +53,7 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 }
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
