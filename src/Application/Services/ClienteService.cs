@@ -1,6 +1,3 @@
-
-using System;
-using System.Threading.Tasks;
 using Domain.Entities;
 using Fast_Bank.Infrastructure.Persistence;
 using DomainClienteService = Domain.Services.ClienteService;
