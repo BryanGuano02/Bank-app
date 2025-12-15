@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Fast_Bank.Infrastructure.Persistence;
 using Fast_Bank.Application.Services;
+using Fast_Bank.API.BackgroundServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,12 @@ builder.Services.AddScoped<IDdContext>(sp => sp.GetRequiredService<DdContext>())
 
 // Application services
 builder.Services.AddScoped<MovimientoService>();
+builder.Services.AddScoped<MovimientoQueryService>();
+builder.Services.AddScoped<CuentaService>();
+builder.Services.AddScoped<CuentaQueryService>();
+builder.Services.AddScoped<InteresesService>();
+
+builder.Services.AddHostedService<InteresesBackgroundService>();
 
 // Configure OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -24,30 +31,29 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// --- AGREGA ESTO ---
+
+// Create or update the database at startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
     try
     {
-        // Reemplaza 'TuDbContext' con el nombre real de tu clase de contexto (ej: AppDbContext)
         var context = services.GetRequiredService<DdContext>();
 
-        // Esto aplica las migraciones pendientes y crea la DB si no existe
+        // Aplicar migraciones pendientes y crear la BD si no existe
         context.Database.Migrate();
 
-        // OJO: Si NO usas migraciones de Entity Framework y solo usas el modelo,
-        // cambia la línea de arriba por: context.Database.EnsureCreated();
+        logger.LogInformation("Base de datos creada/actualizada exitosamente");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocurrió un error al migrar la base de datos.");
+        logger.LogError(ex, "Error al crear la base de datos");
+        throw;
     }
 }
-// -------------------
 
-// ... Aquí sigue tu app.UseSwagger(), etc.
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

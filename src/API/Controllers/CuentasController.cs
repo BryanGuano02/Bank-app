@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Fast_Bank.Infrastructure.Persistence;
-using Domain.Entities;
-using Domain.Patterns.State;
+using Fast_Bank.Application.Services;
 
 namespace Fast_Bank.API.Controllers;
 
@@ -10,43 +8,133 @@ namespace Fast_Bank.API.Controllers;
 [Route("api/[controller]")]
 public class CuentasController : ControllerBase
 {
-    private readonly DdContext _context;
+    private readonly CuentaService _cuentaService;
+    private readonly CuentaQueryService _cuentaQueryService;
 
-    public CuentasController(DdContext context)
+    public CuentasController(
+        CuentaService cuentaService,
+        CuentaQueryService cuentaQueryService)
     {
-        _context = context;
+        _cuentaService = cuentaService;
+        _cuentaQueryService = cuentaQueryService;
     }
 
-    public class CrearCuentaRequest
+    // DTO para Cuenta de Ahorros
+    public class CrearCuentaAhorrosRequest
     {
         public string NumeroCuenta { get; set; } = string.Empty;
         public decimal SaldoInicial { get; set; }
-        public double TasaInteres { get; set; }
+        
+        /// <summary>
+        /// Tasa de interés anual en formato decimal.
+        /// Ejemplo: 0.02 = 2%, 0.12 = 12%, 0.05 = 5%
+        /// </summary>
+        public double TasaInteres { get; set; } = 0.02;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] CrearCuentaRequest req)
+    // DTO para Cuenta Corriente
+    public class CrearCuentaCorrienteRequest
+    {
+        public string NumeroCuenta { get; set; } = string.Empty;
+        public decimal SaldoInicial { get; set; }
+        public decimal LimiteSobregiro { get; set; } = 500;
+    }
+
+    /// <summary>
+    /// Crear una nueva cuenta de ahorros
+    /// </summary>
+    [HttpPost("ahorros")]
+    public async Task<IActionResult> CrearCuentaAhorros([FromBody] CrearCuentaAhorrosRequest req)
     {
         if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.NumeroCuenta)) return BadRequest("NumeroCuenta es requerido.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuenta))
+            return BadRequest("NumeroCuenta es requerido.");
 
-        var existente = await _context.Cuentas.FindAsync(req.NumeroCuenta);
-        if (existente != null) return Conflict("La cuenta ya existe.");
+        try
+        {
+            var cuenta = await _cuentaService.CrearCuentaAhorrosAsync(
+                req.NumeroCuenta,
+                req.SaldoInicial,
+                req.TasaInteres
+            );
 
-        var cuenta = CuentaAhorros.Create(req.NumeroCuenta, req.SaldoInicial, req.TasaInteres, new EstadoCuentaActiva());
-
-        await _context.Cuentas.AddAsync(cuenta);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new { NumeroCuenta = cuenta.NumeroCuenta });
+            return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
+            {
+                NumeroCuenta = cuenta.NumeroCuenta,
+                TipoCuenta = "Ahorros",
+                SaldoInicial = req.SaldoInicial,
+                TasaInteres = req.TasaInteres,
+                FechaApertura = cuenta.FechaApertura
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
+    /// <summary>
+    /// Crear una nueva cuenta corriente
+    /// </summary>
+    [HttpPost("corriente")]
+    public async Task<IActionResult> CrearCuentaCorriente([FromBody] CrearCuentaCorrienteRequest req)
+    {
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.NumeroCuenta))
+            return BadRequest("NumeroCuenta es requerido.");
+
+        try
+        {
+            var cuenta = await _cuentaService.CrearCuentaCorrienteAsync(
+                req.NumeroCuenta,
+                req.SaldoInicial,
+                req.LimiteSobregiro
+            );
+
+            return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
+            {
+                NumeroCuenta = cuenta.NumeroCuenta,
+                TipoCuenta = "Corriente",
+                SaldoInicial = req.SaldoInicial,
+                LimiteSobregiro = req.LimiteSobregiro,
+                FechaApertura = cuenta.FechaApertura
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Consultar una cuenta por número
+    /// </summary>
     [HttpGet("{numero}")]
     public async Task<IActionResult> Get(string numero)
     {
-        var cuenta = await _context.Cuentas.FindAsync(numero);
-        if (cuenta == null) return NotFound();
+        var cuenta = await _cuentaQueryService.ObtenerPorNumeroAsync(numero);
+        
+        if (cuenta == null)
+            return NotFound(new { error = "Cuenta no encontrada." });
 
-        return Ok(new { NumeroCuenta = cuenta.NumeroCuenta, Saldo = cuenta.Saldo });
+        return Ok(cuenta);
+    }
+
+    /// <summary>
+    /// Listar todas las cuentas
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var cuentas = await _cuentaQueryService.ObtenerTodasAsync();
+        return Ok(cuentas);
     }
 }

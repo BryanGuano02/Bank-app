@@ -1,5 +1,5 @@
-using Domain.Interfaces.Types; // Asegúrate de tener este using para ITipoMovimiento
-using Domain.Logic; // RetiroTipo, TransferenciaTipo, InteresTipo, DepositoTipo
+using Domain.Interfaces.Types;
+using Domain.Logic;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,8 +16,6 @@ namespace Domain.Entities
 
         public string Tipo { get; private set; }
 
-        // 2. Esta es tu Estrategia (El objeto real).
-        // [NotMapped] indica a EF Core que ignore esta propiedad para la tabla SQL.
         [NotMapped]
         public ITipoMovimiento Estrategia { get; private set; }
 
@@ -27,14 +25,11 @@ namespace Domain.Entities
 
         // --- CONSTRUCTORES ---
 
-        // Constructor para CREAR movimientos nuevos desde el código (Application Service)
-        // Aquí recibes la Estrategia ya instanciada y guardamos su nombre en 'Tipo'
         public static Movimiento Create(string idMovimiento, decimal monto, Cuenta? origen, Cuenta destino, string descripcion, ITipoMovimiento estrategia)
         {
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.");
             if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser > 0.");
             if (estrategia == null) throw new ArgumentNullException(nameof(estrategia));
-
             if (destino == null) throw new ArgumentNullException(nameof(destino));
 
             return new Movimiento
@@ -45,15 +40,12 @@ namespace Domain.Entities
                 Destino = destino,
                 Descripcion = descripcion,
                 Fecha = DateTime.UtcNow,
-
-                // Asignamos la estrategia y el string para la BD
                 Estrategia = estrategia,
                 Tipo = ObtenerNombreDeEstrategia(estrategia)
             };
         }
 
         // Constructor PROTEGIDO para EF Core (Materialización)
-        // EF llamará a este constructor cuando lea de la BD. Le pasará el valor de la columna 'Tipo'.
         protected Movimiento(string idMovimiento, decimal monto, string tipo, string descripcion, DateTime fecha)
         {
             IdMovimiento = idMovimiento;
@@ -61,19 +53,22 @@ namespace Domain.Entities
             Descripcion = descripcion;
             Fecha = fecha;
             Tipo = tipo;
-
-            // ¡AQUÍ OCURRE LA MAGIA AUTOMÁTICA!
-            // Convertimos el string "RETIRO" -> new RetiroTipo()
+            Destino = null!;
             Estrategia = ResolverEstrategia(tipo);
         }
 
-        // Necesario para EF Core en algunos casos de proxy, pero intentará usar el parametrizado arriba
-        protected Movimiento() { }
+        // Necesario para EF Core en algunos casos de proxy
+        protected Movimiento()
+        {
+            IdMovimiento = string.Empty;
+            Descripcion = string.Empty;
+            Tipo = string.Empty;
+            Estrategia = null!;
+            Destino = null!;
+        }
 
+        // --- MÉTODOS AUXILIARES ---
 
-        // --- MÉTODOS AUXILIARES (FACTORIES INTERNAS) ---
-
-        // Convierte el Texto de la BD a la Clase Estrategia
         private static ITipoMovimiento ResolverEstrategia(string tipo)
         {
             return tipo?.ToUpper() switch
@@ -86,7 +81,6 @@ namespace Domain.Entities
             };
         }
 
-        // Convierte la Clase Estrategia al Texto para la BD
         private static string ObtenerNombreDeEstrategia(ITipoMovimiento estrategia)
         {
             return estrategia switch
@@ -99,13 +93,12 @@ namespace Domain.Entities
             };
         }
 
-        // Método para ejecutar la lógica (El Service llama a esto)
         public void Ejecutar()
         {
             if (Estrategia == null)
                 throw new InvalidOperationException("La estrategia no se ha cargado.");
 
-            Estrategia.procesar(this); // Pasamos 'this' (el movimiento completo)
+            Estrategia.procesar(this);
         }
     }
 }

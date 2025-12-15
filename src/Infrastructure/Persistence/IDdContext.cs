@@ -14,6 +14,7 @@ namespace Fast_Bank.Infrastructure.Persistence
         DbSet<CuentaCorriente> CuentasCorrientes { get; }
         DbSet<TarjetaCredito> TarjetasCredito { get; }
         DbSet<EntidadFinanciera> EntidadesFinancieras { get; }
+        DbSet<ControlEjecucion> ControlEjecuciones { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

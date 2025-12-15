@@ -11,9 +11,7 @@ namespace Domain.Logic
         public void procesar(Movimiento movimiento)
         {
             validar(movimiento);
-
-            // Retirar primero de la cuenta origen y luego acreditar en la cuenta destino.
-            movimiento.Origen.Retirar(movimiento.Monto);
+            movimiento.Origen!.Retirar(movimiento.Monto);
             movimiento.Destino.Depositar(movimiento.Monto);
         }
 
