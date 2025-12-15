@@ -1,9 +1,6 @@
-using Domain.Entities;
-using Domain.Patterns.State;
-using Fast_Bank.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Fast_Bank.Application.Services;
 
 namespace Fast_Bank.API.Controllers;
 
@@ -11,11 +8,15 @@ namespace Fast_Bank.API.Controllers;
 [Route("api/[controller]")]
 public class CuentasController : ControllerBase
 {
-    private readonly DdContext _context;
+    private readonly CuentaService _cuentaService;
+    private readonly CuentaQueryService _cuentaQueryService;
 
-    public CuentasController(DdContext context)
+    public CuentasController(
+        CuentaService cuentaService,
+        CuentaQueryService cuentaQueryService)
     {
-        _context = context;
+        _cuentaService = cuentaService;
+        _cuentaQueryService = cuentaQueryService;
     }
 
     // DTO para Cuenta de Ahorros
@@ -23,7 +24,12 @@ public class CuentasController : ControllerBase
     {
         public string NumeroCuenta { get; set; } = string.Empty;
         public decimal SaldoInicial { get; set; }
-        public double TasaInteres { get; set; } = 0.02; // 2% por defecto
+        
+        /// <summary>
+        /// Tasa de interés anual en formato decimal.
+        /// Ejemplo: 0.02 = 2%, 0.12 = 12%, 0.05 = 5%
+        /// </summary>
+        public double TasaInteres { get; set; } = 0.02;
     }
 
     // DTO para Cuenta Corriente
@@ -31,7 +37,7 @@ public class CuentasController : ControllerBase
     {
         public string NumeroCuenta { get; set; } = string.Empty;
         public decimal SaldoInicial { get; set; }
-        public decimal LimiteSobregiro { get; set; } = 500; // $500 por defecto
+        public decimal LimiteSobregiro { get; set; } = 500;
     }
 
     /// <summary>
@@ -44,28 +50,31 @@ public class CuentasController : ControllerBase
         if (string.IsNullOrWhiteSpace(req.NumeroCuenta))
             return BadRequest("NumeroCuenta es requerido.");
 
-        var existente = await _context.Cuentas.FindAsync(req.NumeroCuenta);
-        if (existente != null)
-            return Conflict("La cuenta ya existe.");
-
-        var cuenta = CuentaAhorros.Create(
-            req.NumeroCuenta,
-            req.SaldoInicial,
-            req.TasaInteres,
-            new EstadoCuentaActiva()
-        );
-
-        await _context.Cuentas.AddAsync(cuenta);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
+        try
         {
-            NumeroCuenta = cuenta.NumeroCuenta,
-            TipoCuenta = "Ahorros",
-            SaldoInicial = req.SaldoInicial,
-            TasaInteres = req.TasaInteres,
-            FechaApertura = cuenta.FechaApertura
-        });
+            var cuenta = await _cuentaService.CrearCuentaAhorrosAsync(
+                req.NumeroCuenta,
+                req.SaldoInicial,
+                req.TasaInteres
+            );
+
+            return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
+            {
+                NumeroCuenta = cuenta.NumeroCuenta,
+                TipoCuenta = "Ahorros",
+                SaldoInicial = req.SaldoInicial,
+                TasaInteres = req.TasaInteres,
+                FechaApertura = cuenta.FechaApertura
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
     /// <summary>
@@ -78,28 +87,31 @@ public class CuentasController : ControllerBase
         if (string.IsNullOrWhiteSpace(req.NumeroCuenta))
             return BadRequest("NumeroCuenta es requerido.");
 
-        var existente = await _context.Cuentas.FindAsync(req.NumeroCuenta);
-        if (existente != null)
-            return Conflict("La cuenta ya existe.");
-
-        var cuenta = CuentaCorriente.Create(
-            req.NumeroCuenta,
-            req.SaldoInicial,
-            req.LimiteSobregiro,
-            new EstadoCuentaActiva()
-        );
-
-        await _context.Cuentas.AddAsync(cuenta);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
+        try
         {
-            NumeroCuenta = cuenta.NumeroCuenta,
-            TipoCuenta = "Corriente",
-            SaldoInicial = req.SaldoInicial,
-            LimiteSobregiro = req.LimiteSobregiro,
-            FechaApertura = cuenta.FechaApertura
-        });
+            var cuenta = await _cuentaService.CrearCuentaCorrienteAsync(
+                req.NumeroCuenta,
+                req.SaldoInicial,
+                req.LimiteSobregiro
+            );
+
+            return CreatedAtAction(nameof(Get), new { numero = cuenta.NumeroCuenta }, new
+            {
+                NumeroCuenta = cuenta.NumeroCuenta,
+                TipoCuenta = "Corriente",
+                SaldoInicial = req.SaldoInicial,
+                LimiteSobregiro = req.LimiteSobregiro,
+                FechaApertura = cuenta.FechaApertura
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
     /// <summary>
@@ -108,46 +120,12 @@ public class CuentasController : ControllerBase
     [HttpGet("{numero}")]
     public async Task<IActionResult> Get(string numero)
     {
-        var cuenta = await _context.Cuentas.FindAsync(numero);
-        if (cuenta == null) return NotFound();
+        var cuenta = await _cuentaQueryService.ObtenerPorNumeroAsync(numero);
+        
+        if (cuenta == null)
+            return NotFound(new { error = "Cuenta no encontrada." });
 
-        // Retornar información según el tipo de cuenta
-        object response;
-
-        if (cuenta is CuentaCorriente cuentaCorriente)
-        {
-            response = new
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                Saldo = cuenta.Saldo,
-                TipoCuenta = "Corriente",
-                LimiteSobregiro = cuentaCorriente.LimiteSobregiro,
-                SaldoDisponible = cuenta.Saldo + cuentaCorriente.LimiteSobregiro,
-                FechaApertura = cuenta.FechaApertura
-            };
-        }
-        else if (cuenta is CuentaAhorros cuentaAhorros)
-        {
-            response = new
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                Saldo = cuenta.Saldo,
-                TipoCuenta = "Ahorros",
-                TasaInteres = cuentaAhorros.TasaInteres,
-                FechaApertura = cuenta.FechaApertura
-            };
-        }
-        else
-        {
-            response = new
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                Saldo = cuenta.Saldo,
-                FechaApertura = cuenta.FechaApertura
-            };
-        }
-
-        return Ok(response);
+        return Ok(cuenta);
     }
 
     /// <summary>
@@ -156,44 +134,7 @@ public class CuentasController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var cuentas = await _context.Cuentas.ToListAsync();
-
-        var response = cuentas.Select<Cuenta, object>(cuenta =>
-        {
-            if (cuenta is CuentaCorriente cc)
-            {
-                return new
-                {
-                    NumeroCuenta = cuenta.NumeroCuenta,
-                    TipoCuenta = "Corriente",
-                    Saldo = cuenta.Saldo,
-                    LimiteSobregiro = cc.LimiteSobregiro,
-                    FechaApertura = cuenta.FechaApertura
-                };
-            }
-            else if (cuenta is CuentaAhorros ca)
-            {
-                return new
-                {
-                    NumeroCuenta = cuenta.NumeroCuenta,
-                    TipoCuenta = "Ahorros",
-                    Saldo = cuenta.Saldo,
-                    TasaInteres = ca.TasaInteres,
-                    FechaApertura = cuenta.FechaApertura
-                };
-            }
-            else
-            {
-                return new
-                {
-                    NumeroCuenta = cuenta.NumeroCuenta,
-                    TipoCuenta = "Desconocido",
-                    Saldo = cuenta.Saldo,
-                    FechaApertura = cuenta.FechaApertura
-                };
-            }
-        });
-
-        return Ok(response);
+        var cuentas = await _cuentaQueryService.ObtenerTodasAsync();
+        return Ok(cuentas);
     }
 }

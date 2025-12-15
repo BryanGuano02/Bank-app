@@ -18,6 +18,9 @@ builder.Services.AddScoped<IDdContext>(sp => sp.GetRequiredService<DdContext>())
 
 // Application services
 builder.Services.AddScoped<MovimientoService>();
+builder.Services.AddScoped<MovimientoQueryService>();
+builder.Services.AddScoped<CuentaService>();
+builder.Services.AddScoped<CuentaQueryService>();
 builder.Services.AddScoped<InteresesService>();
 
 builder.Services.AddHostedService<InteresesBackgroundService>();
@@ -28,7 +31,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// *** CREAR BASE DE DATOS AUTOMÁTICAMENTE ***
+// Create or update the database at startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

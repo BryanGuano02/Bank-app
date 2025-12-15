@@ -9,10 +9,14 @@ namespace Fast_Bank.API.Controllers;
 public class MovimientosController : ControllerBase
 {
     private readonly MovimientoService _movimientoService;
+    private readonly MovimientoQueryService _movimientoQueryService;
 
-    public MovimientosController(MovimientoService movimientoService)
+    public MovimientosController(
+        MovimientoService movimientoService,
+        MovimientoQueryService movimientoQueryService)
     {
         _movimientoService = movimientoService;
+        _movimientoQueryService = movimientoQueryService;
     }
 
     public class DepositoRequest
@@ -21,7 +25,7 @@ public class MovimientosController : ControllerBase
         public decimal Monto { get; set; }
         public string? Descripcion { get; set; }
     }
-    
+
     public class RetiroRequest
     {
         public string NumeroCuentaOrigen { get; set; } = string.Empty;
@@ -37,55 +41,78 @@ public class MovimientosController : ControllerBase
         public string? Descripcion { get; set; }
     }
 
+    /// <summary>
+    /// Realizar un depósito
+    /// </summary>
     [HttpPost("depositar")]
     public async Task<IActionResult> Depositar([FromBody] DepositoRequest req)
     {
         if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.NumeroCuentaDestino)) return BadRequest("NumeroCuentaDestino es requerido.");
-        if (req.Monto <= 0) return BadRequest("Monto debe ser mayor que cero.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaDestino)) 
+            return BadRequest("NumeroCuentaDestino es requerido.");
+        if (req.Monto <= 0) 
+            return BadRequest("Monto debe ser mayor que cero.");
 
-        var id = await _movimientoService.DepositarAsync(req.NumeroCuentaDestino, req.Monto, req.Descripcion ?? string.Empty);
+        var id = await _movimientoService.DepositarAsync(
+            req.NumeroCuentaDestino, 
+            req.Monto, 
+            req.Descripcion ?? string.Empty);
 
         return CreatedAtAction(nameof(GetById), new { id }, new { IdMovimiento = id });
     }
 
+    /// <summary>
+    /// Realizar un retiro
+    /// </summary>
     [HttpPost("retirar")]
     public async Task<IActionResult> Retirar([FromBody] RetiroRequest req)
     {
         if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen)) return BadRequest("NumeroCuentaOrigen es requerido.");
-        if (req.Monto <= 0) return BadRequest("Monto debe ser mayor que cero.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen)) 
+            return BadRequest("NumeroCuentaOrigen es requerido.");
+        if (req.Monto <= 0) 
+            return BadRequest("Monto debe ser mayor que cero.");
 
         try
         {
-            var id = await _movimientoService.RetirarAsync(req.NumeroCuentaOrigen, req.Monto, req.Descripcion ?? string.Empty);
-
+            var id = await _movimientoService.RetirarAsync(
+                req.NumeroCuentaOrigen, 
+                req.Monto, 
+                req.Descripcion ?? string.Empty);
             return CreatedAtAction(nameof(GetById), new { id }, new { IdMovimiento = id });
         }
         catch (InvalidOperationException ex)
         {
-            // Captura errores de negocio (saldo insuficiente, sobregiro excedido, cuenta bloqueada, etc.)
             return BadRequest(new { error = ex.Message });
         }
     }
 
+    /// <summary>
+    /// Realizar una transferencia
+    /// </summary>
     [HttpPost("transferir")]
     public async Task<IActionResult> Transferir([FromBody] TransferenciaRequest req)
     {
         if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen)) return BadRequest("NumeroCuentaOrigen es requerido.");
-        if (string.IsNullOrWhiteSpace(req.NumeroCuentaDestino)) return BadRequest("NumeroCuentaDestino es requerido.");
-        if (req.Monto <= 0) return BadRequest("Monto debe ser mayor que cero.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaOrigen)) 
+            return BadRequest("NumeroCuentaOrigen es requerido.");
+        if (string.IsNullOrWhiteSpace(req.NumeroCuentaDestino)) 
+            return BadRequest("NumeroCuentaDestino es requerido.");
+        if (req.Monto <= 0) 
+            return BadRequest("Monto debe ser mayor que cero.");
 
         try
         {
-            var id = await _movimientoService.TransferirAsync(req.NumeroCuentaOrigen, req.NumeroCuentaDestino, req.Monto, req.Descripcion ?? string.Empty);
-
-            return CreatedAtAction(nameof(GetById), new { id }, new { IdMovimiento = id, Mensaje = "Transferencia completada exitosamente." });
+            var id = await _movimientoService.TransferirAsync(
+                req.NumeroCuentaOrigen, 
+                req.NumeroCuentaDestino, 
+                req.Monto, 
+                req.Descripcion ?? string.Empty);
+            return CreatedAtAction(nameof(GetById), new { id }, 
+                new { IdMovimiento = id, Mensaje = "Transferencia completada exitosamente." });
         }
         catch (InvalidOperationException ex)
         {
-            // Captura errores de negocio (saldo insuficiente, sobregiro excedido, cuenta bloqueada, cuentas inexistentes, etc.)
             return BadRequest(new { error = ex.Message });
         }
         catch (ArgumentException ex)
@@ -94,10 +121,41 @@ public class MovimientosController : ControllerBase
         }
     }
 
-    // Minimal GET placeholder so CreatedAtAction has a target — implementation can be expanded.
+    /// <summary>
+    /// Consultar un movimiento por ID
+    /// </summary>
     [HttpGet("{id}")]
-    public IActionResult GetById(string id)
+    public async Task<IActionResult> GetById(string id)
     {
-        return Ok(new { Id = id });
+        var movimiento = await _movimientoQueryService.ObtenerPorIdAsync(id);
+        
+        if (movimiento == null)
+            return NotFound(new { error = "Movimiento no encontrado." });
+
+        return Ok(movimiento);
+    }
+
+    /// <summary>
+    /// Listar todos los movimientos
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var movimientos = await _movimientoQueryService.ObtenerTodosAsync();
+        return Ok(movimientos);
+    }
+
+    /// <summary>
+    /// Obtener movimientos de una cuenta específica
+    /// </summary>
+    [HttpGet("cuenta/{numeroCuenta}")]
+    public async Task<IActionResult> GetByNumeroCuenta(string numeroCuenta)
+    {
+        var movimientos = await _movimientoQueryService.ObtenerPorCuentaAsync(numeroCuenta);
+        
+        if (!movimientos.Any())
+            return Ok(new List<MovimientoDto>()); // Retorna lista vacía en lugar de 404
+
+        return Ok(movimientos);
     }
 }
