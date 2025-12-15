@@ -21,7 +21,7 @@ namespace Fast_Bank.Application.Services
             double tasaInteres)
         {
             if (string.IsNullOrWhiteSpace(numeroCuenta))
-                throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
+                throw new ArgumentException("NÃºmero de cuenta invÃ¡lido.", nameof(numeroCuenta));
 
             var existente = await _context.Cuentas.FindAsync(numeroCuenta);
             if (existente != null)
@@ -46,7 +46,7 @@ namespace Fast_Bank.Application.Services
             decimal limiteSobregiro)
         {
             if (string.IsNullOrWhiteSpace(numeroCuenta))
-                throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
+                throw new ArgumentException("NÃºmero de cuenta invÃ¡lido.", nameof(numeroCuenta));
 
             var existente = await _context.Cuentas.FindAsync(numeroCuenta);
             if (existente != null)
