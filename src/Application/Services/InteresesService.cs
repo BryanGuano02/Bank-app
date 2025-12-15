@@ -22,7 +22,6 @@ namespace Fast_Bank.Application.Services
         {
             var resultado = new AcreditacionInteresesResult();
 
-            // Obtener todas las cuentas de ahorros
             var cuentasAhorros = await _context.CuentasAhorros
                 .Where(c => c.Saldo > 0) // Solo cuentas con saldo positivo
                 .ToListAsync();
@@ -31,10 +30,10 @@ namespace Fast_Bank.Application.Services
             {
                 try
                 {
-                    // Calcular interés
+                    // Calcular interï¿½s
                     var montoInteres = _domainInteresesService.CalcularInteresMensual(cuenta);
 
-                    // Si el interés es mayor a cero, acreditarlo
+                    // Si el interï¿½s es mayor a cero, acreditarlo
                     if (montoInteres > 0)
                     {
                         var movimiento = _domainInteresesService.CrearYEjecutarAcreditacionInteres(
@@ -67,7 +66,6 @@ namespace Fast_Bank.Application.Services
                 }
             }
 
-            // Guardar todos los cambios en una sola transacción
             await _context.SaveChangesAsync();
 
             return resultado;
@@ -76,19 +74,19 @@ namespace Fast_Bank.Application.Services
         public async Task<DetalleAcreditacion> AcreditarInteresACuentaAsync(string numeroCuenta)
         {
             if (string.IsNullOrWhiteSpace(numeroCuenta))
-                throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
+                throw new ArgumentException("Nï¿½mero de cuenta invï¿½lido.", nameof(numeroCuenta));
 
             var cuenta = await _context.CuentasAhorros
                 .FirstOrDefaultAsync(c => c.NumeroCuenta == numeroCuenta);
 
             if (cuenta == null)
-                throw new InvalidOperationException($"No se encontró cuenta de ahorros con número: {numeroCuenta}");
+                throw new InvalidOperationException($"No se encontrï¿½ cuenta de ahorros con nï¿½mero: {numeroCuenta}");
 
             var saldoAnterior = cuenta.Saldo;
             var montoInteres = _domainInteresesService.CalcularInteresMensual(cuenta);
 
             if (montoInteres <= 0)
-                throw new InvalidOperationException("El monto de interés calculado es cero o negativo.");
+                throw new InvalidOperationException("El monto de interï¿½s calculado es cero o negativo.");
 
             var movimiento = _domainInteresesService.CrearYEjecutarAcreditacionInteres(
                 Guid.NewGuid().ToString(),
@@ -112,13 +110,13 @@ namespace Fast_Bank.Application.Services
         public async Task<SimulacionInteresResult> SimularInteresAsync(string numeroCuenta)
         {
             if (string.IsNullOrWhiteSpace(numeroCuenta))
-                throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
+                throw new ArgumentException("Nï¿½mero de cuenta invï¿½lido.", nameof(numeroCuenta));
 
             var cuenta = await _context.CuentasAhorros
                 .FirstOrDefaultAsync(c => c.NumeroCuenta == numeroCuenta);
 
             if (cuenta == null)
-                throw new InvalidOperationException($"No se encontró cuenta de ahorros con número: {numeroCuenta}");
+                throw new InvalidOperationException($"No se encontrï¿½ cuenta de ahorros con nï¿½mero: {numeroCuenta}");
 
             var interesMensual = _domainInteresesService.CalcularInteresMensual(cuenta);
 

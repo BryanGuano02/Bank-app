@@ -15,10 +15,8 @@ namespace Domain.Entities
         public string Correo { get; private set; }
         public string Telefono { get; private set; }
 
-        // Navigation: un cliente puede tener una sola cuenta
         public Cuenta? Cuenta { get; private set; }
 
-        // Parameterless constructor for EF Core
         protected Cliente()
         {
             Cedula = string.Empty;
@@ -53,29 +51,6 @@ namespace Domain.Entities
             return new Cliente(cedula, nombre, apellido, direccion, correo, telefono);
         }
 
-        // Crear y asociar una cuenta de ahorros al cliente (solo si no tiene una cuenta)
-        public CuentaAhorros CrearCuentaAhorros(string numeroCuenta, decimal saldoInicial, double tasaInteres, Interfaces.States.IEstadoCuenta estadoInicial)
-        {
-            if (Cuenta != null) throw new InvalidOperationException("El cliente ya tiene una cuenta.");
-
-            var cuenta = CuentaAhorros.Create(numeroCuenta, saldoInicial, tasaInteres, estadoInicial);
-            cuenta.SetCliente(this);
-            Cuenta = cuenta;
-            return cuenta;
-        }
-
-        // Crear y asociar una cuenta corriente al cliente (solo si no tiene una cuenta)
-        public CuentaCorriente CrearCuentaCorriente(string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro, Interfaces.States.IEstadoCuenta estadoInicial)
-        {
-            if (Cuenta != null) throw new InvalidOperationException("El cliente ya tiene una cuenta.");
-
-            var cuenta = CuentaCorriente.Create(numeroCuenta, saldoInicial, limiteSobregiro, estadoInicial);
-            cuenta.SetCliente(this);
-            Cuenta = cuenta;
-            return cuenta;
-        }
-
-        // Actualiza los datos del cliente validando los parámetros.
         public void Update(string nombre, string apellido, string direccion, string correo, string telefono)
         {
             if (string.IsNullOrWhiteSpace(nombre)) throw new ArgumentException("Nombre inválido.", nameof(nombre));
@@ -89,6 +64,11 @@ namespace Domain.Entities
             Direccion = direccion;
             Correo = correo;
             Telefono = telefono;
+        }
+
+        internal void SetCuenta(Cuenta cuenta)
+        {
+            Cuenta = cuenta ?? throw new ArgumentNullException(nameof(cuenta));
         }
     }
 }
