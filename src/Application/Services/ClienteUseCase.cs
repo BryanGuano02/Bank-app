@@ -18,14 +18,18 @@ public class ClienteUseCase
 
     public async Task<List<Cliente>> GetAllClientesAsync()
     {
-        return await _context.Clientes.ToListAsync();
+        return await _context.Clientes
+            .Include(c => c.Cuenta)
+            .ToListAsync();
     }
 
     public async Task<Cliente?> GetClienteAsync(string cedula)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
 
-        return await _context.Clientes.FindAsync(cedula);
+        return await _context.Clientes
+            .Include(c => c.Cuenta)
+            .FirstOrDefaultAsync(c => c.Cedula == cedula);
     }
 
     public async Task<Cliente> ActualizarClienteAsync(string cedula, string nombre, string apellido, string direccion, string correo, string telefono)

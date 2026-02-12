@@ -159,7 +159,8 @@ public class ClienteController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var clientes = await _clienteService.GetAllClientesAsync();
-        return Ok(clientes);
+        var dtos = clientes.Select(MapToDto);
+        return Ok(dtos);
     }
 
     [HttpGet("{cedula}")]
@@ -170,7 +171,7 @@ public class ClienteController : ControllerBase
         var cliente = await _clienteService.GetClienteAsync(cedula);
         if (cliente == null) return NotFound(new { error = "Cliente no encontrado." });
 
-        return Ok(cliente);
+        return Ok(MapToDto(cliente));
     }
 
     [HttpPut("{cedula}")]
@@ -200,6 +201,65 @@ public class ClienteController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
+    }
+
+    private ClienteDto MapToDto(Cliente cliente)
+    {
+        CuentaDto? cuentaDto = null;
+        if (cliente.Cuenta != null)
+        {
+            cuentaDto = new CuentaDto
+            {
+                NumeroCuenta = cliente.Cuenta.NumeroCuenta,
+                Saldo = cliente.Cuenta.Saldo,
+                FechaApertura = cliente.Cuenta.FechaApertura
+            };
+
+            if (cliente.Cuenta is CuentaCorriente cc)
+            {
+                cuentaDto.TipoCuenta = "Corriente";
+                cuentaDto.LimiteSobregiro = cc.LimiteSobregiro;
+                cuentaDto.InteresSobregiro = cc.InteresSobregiro;
+            }
+            else if (cliente.Cuenta is CuentaAhorros ca)
+            {
+                cuentaDto.TipoCuenta = "Ahorros";
+                cuentaDto.TasaInteres = ca.TasaInteres;
+            }
+        }
+
+        return new ClienteDto
+        {
+            Cedula = cliente.Cedula,
+            Nombre = cliente.Nombre,
+            Apellido = cliente.Apellido,
+            Direccion = cliente.Direccion,
+            Correo = cliente.Correo,
+            Telefono = cliente.Telefono,
+            Cuenta = cuentaDto
+        };
+    }
+
+    public class ClienteDto
+    {
+        public string Cedula { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Direccion { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public CuentaDto? Cuenta { get; set; }
+    }
+
+    public class CuentaDto
+    {
+        public string NumeroCuenta { get; set; } = string.Empty;
+        public string TipoCuenta { get; set; } = string.Empty;
+        public decimal Saldo { get; set; }
+        public DateTime FechaApertura { get; set; }
+        public decimal? LimiteSobregiro { get; set; }
+        public decimal? InteresSobregiro { get; set; }
+        public double? TasaInteres { get; set; }
     }
 
 }
