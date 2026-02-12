@@ -26,6 +26,8 @@ builder.Services.AddScoped<ClienteUseCase>();
 // Domain services (used by application services)
 builder.Services.AddScoped<Domain.Services.MovimientoService>();
 builder.Services.AddScoped<Domain.Services.ClienteService>();
+builder.Services.AddScoped<Domain.Services.CuentaService>();
+builder.Services.AddScoped<Domain.Services.InteresesService>();
 
 builder.Services.AddHostedService<InteresesBackgroundService>();
 
