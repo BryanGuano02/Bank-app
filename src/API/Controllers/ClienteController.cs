@@ -10,12 +10,10 @@ namespace Fast_Bank.API.Controllers;
 public class ClienteController : ControllerBase
 {
     private readonly ClienteService _clienteService;
-    private readonly CuentaService _cuentaService;
 
-    public ClienteController(ClienteService clienteService, CuentaService cuentaService)
+    public ClienteController(ClienteService clienteService)
     {
         _clienteService = clienteService;
-        _cuentaService = cuentaService;
     }
 
     public class CrearClienteRequest
@@ -82,6 +80,24 @@ public class ClienteController : ControllerBase
         }
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var clientes = await _clienteService.GetAllClientesAsync();
+        return Ok(clientes);
+    }
+
+    [HttpGet("{cedula}")]
+    public async Task<IActionResult> GetById(string cedula)
+    {
+        if (string.IsNullOrWhiteSpace(cedula)) return BadRequest("Cédula es requerida.");
+
+        var cliente = await _clienteService.GetClienteAsync(cedula);
+        if (cliente == null) return NotFound(new { error = "Cliente no encontrado." });
+
+        return Ok(cliente);
+    }
+
     [HttpPut("{cedula}")]
     public async Task<IActionResult> Actualizar(string cedula, [FromBody] ActualizarClienteRequest req)
     {
@@ -120,7 +136,7 @@ public class ClienteController : ControllerBase
 
         try
         {
-            var cuenta = await _cuentaService.CrearCuentaAhorrosAsync(
+            var cuenta = await _clienteService.CrearCuentaAhorrosAsync(
                 cedula,
                 req.NumeroCuenta,
                 req.SaldoInicial,
@@ -155,7 +171,7 @@ public class ClienteController : ControllerBase
 
         try
         {
-            var cuenta = await _cuentaService.CrearCuentaCorrienteAsync(
+            var cuenta = await _clienteService.CrearCuentaCorrienteAsync(
                 cedula,
                 req.NumeroCuenta,
                 req.SaldoInicial,

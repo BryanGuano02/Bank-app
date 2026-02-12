@@ -6,18 +6,21 @@ namespace Domain.Entities
 {
     public class CuentaCorriente : Cuenta
     {
-        public decimal LimiteSobregiro { get; private set; }
+        public decimal LimiteSobregiro { get; private set; } = 200m;
+        public decimal InteresSobregiro { get; private set; } = 0.02m;
 
         // Parameterless constructor for EF Core
         protected CuentaCorriente() : base()
         {
-            LimiteSobregiro = 0m;
         }
 
         public CuentaCorriente(string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro, IEstadoCuenta estadoInicial)
             : base(numeroCuenta, saldoInicial, estadoInicial)
         {
-            LimiteSobregiro = limiteSobregiro;
+            if (limiteSobregiro != 0)
+            {
+                LimiteSobregiro = limiteSobregiro;
+            }
         }
 
         public static CuentaCorriente Create(string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro, IEstadoCuenta estadoInicial)

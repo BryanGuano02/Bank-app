@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Fast_Bank.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using DomainClienteService = Domain.Services.ClienteService;
 
 namespace Fast_Bank.Application.Services;
@@ -13,6 +14,18 @@ public class ClienteService
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _domainClienteService = domainClienteService ?? throw new ArgumentNullException(nameof(domainClienteService));
+    }
+
+    public async Task<List<Cliente>> GetAllClientesAsync()
+    {
+        return await _context.Clientes.ToListAsync();
+    }
+
+    public async Task<Cliente?> GetClienteAsync(string cedula)
+    {
+        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
+
+        return await _context.Clientes.FindAsync(cedula);
     }
 
     public async Task<Cliente> CrearClienteAsync(string cedula, string nombre, string apellido, string direccion, string correo, string telefono)
