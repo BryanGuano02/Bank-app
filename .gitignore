@@ -125,3 +125,9 @@ fastBankBD.db
 
 ## IDE workspace files
 *.code-workspace
+
+## Docker
+docker-compose.override.yml
+
+## Local Data
+data/
