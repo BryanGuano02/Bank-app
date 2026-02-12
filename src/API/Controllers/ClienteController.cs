@@ -9,14 +9,14 @@ namespace Fast_Bank.API.Controllers;
 [Route("api/[controller]")]
 public class ClienteController : ControllerBase
 {
-    private readonly ClienteService _clienteService;
+    private readonly ClienteUseCase _clienteService;
 
-    public ClienteController(ClienteService clienteService)
+    public ClienteController(ClienteUseCase clienteService)
     {
         _clienteService = clienteService;
     }
 
-    public class CrearClienteRequest
+    public class CrearClienteConCuentaCorrienteRequest
     {
         public string Cedula { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
@@ -24,6 +24,19 @@ public class ClienteController : ControllerBase
         public string Direccion { get; set; } = string.Empty;
         public string Correo { get; set; } = string.Empty;
         public string Telefono { get; set; } = string.Empty;
+        public decimal SaldoInicial { get; set; }
+    }
+
+    public class CrearClienteConCuentaAhorrosRequest
+    {
+        public string Cedula { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Direccion { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public decimal SaldoInicial { get; set; }
+        public double TasaInteres { get; set; } = 2;
     }
 
     public class ActualizarClienteRequest
@@ -50,25 +63,86 @@ public class ClienteController : ControllerBase
         public decimal LimiteSobregiro { get; set; } = 500;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] CrearClienteRequest req)
+    [HttpPost("con-cuenta-corriente")]
+    public async Task<IActionResult> CrearConCuentaCorriente([FromBody] CrearClienteConCuentaCorrienteRequest req)
     {
         if (req == null) return BadRequest();
         if (string.IsNullOrWhiteSpace(req.Cedula)) return BadRequest("Cédula es requerida.");
 
         try
         {
-            var cliente = await _clienteService.CrearClienteAsync(
+            var cliente = await _clienteService.CrearClienteConCuentaCorrienteAsync(
                 req.Cedula,
                 req.Nombre,
                 req.Apellido,
                 req.Direccion,
                 req.Correo,
-                req.Telefono
+                req.Telefono,
+                req.SaldoInicial
             );
 
+            var cuentaCorriente = cliente.Cuenta as CuentaCorriente;
             var location = $"/api/cliente/{cliente.Cedula}";
-            return Created(location, new { Cedula = cliente.Cedula });
+            return Created(location, new
+            {
+                Cedula = cliente.Cedula,
+                Nombre = cliente.Nombre,
+                Apellido = cliente.Apellido,
+                Cuenta = new
+                {
+                    NumeroCuenta = cliente.Cuenta?.NumeroCuenta,
+                    TipoCuenta = "Corriente",
+                    Saldo = cliente.Cuenta?.Saldo,
+                    LimiteSobregiro = cuentaCorriente?.LimiteSobregiro,
+                    FechaApertura = cliente.Cuenta?.FechaApertura
+                }
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpPost("con-cuenta-ahorros")]
+    public async Task<IActionResult> CrearConCuentaAhorros([FromBody] CrearClienteConCuentaAhorrosRequest req)
+    {
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.Cedula)) return BadRequest("Cédula es requerida.");
+
+        try
+        {
+            var cliente = await _clienteService.CrearClienteConCuentaAhorrosAsync(
+                req.Cedula,
+                req.Nombre,
+                req.Apellido,
+                req.Direccion,
+                req.Correo,
+                req.Telefono,
+                req.SaldoInicial,
+                req.TasaInteres
+            );
+
+            var cuentaAhorros = cliente.Cuenta as CuentaAhorros;
+            var location = $"/api/cliente/{cliente.Cedula}";
+            return Created(location, new
+            {
+                Cedula = cliente.Cedula,
+                Nombre = cliente.Nombre,
+                Apellido = cliente.Apellido,
+                Cuenta = new
+                {
+                    NumeroCuenta = cliente.Cuenta?.NumeroCuenta,
+                    TipoCuenta = "Ahorros",
+                    Saldo = cliente.Cuenta?.Saldo,
+                    TasaInteres = cuentaAhorros?.TasaInteres,
+                    FechaApertura = cliente.Cuenta?.FechaApertura
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {

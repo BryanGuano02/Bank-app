@@ -9,9 +9,9 @@ namespace Fast_Bank.API.Controllers;
 public class CuentasController : ControllerBase
 {
     private readonly CuentaQueryService _cuentaQueryService;
-    private readonly MovimientoService _movimientoService;
+    private readonly MovimientoUseCase _movimientoService;
 
-    public CuentasController(CuentaQueryService cuentaQueryService, MovimientoService movimientoService)
+    public CuentasController(CuentaQueryService cuentaQueryService, MovimientoUseCase movimientoService)
     {
         _cuentaQueryService = cuentaQueryService;
         _movimientoService = movimientoService;

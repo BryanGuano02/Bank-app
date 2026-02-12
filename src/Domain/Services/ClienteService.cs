@@ -13,21 +13,19 @@ namespace Domain.Services
 
         public Cliente CrearClienteConCuentaCorriente(
             string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-            string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro,
-            Interfaces.States.IEstadoCuenta? estadoInicial = null)
+            decimal saldoInicial, Interfaces.States.IEstadoCuenta? estadoInicial = null)
         {
             var cliente = Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
-            _cuentaService.CrearCuentaCorriente(cliente, numeroCuenta, saldoInicial, limiteSobregiro, estadoInicial);
+            _cuentaService.CrearCuentaCorriente(cliente, saldoInicial, estadoInicial);
             return cliente;
         }
 
         public Cliente CrearClienteConCuentaAhorros(
             string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-            string numeroCuenta, decimal saldoInicial, double tasaInteres,
-            Interfaces.States.IEstadoCuenta? estadoInicial = null)
+            decimal saldoInicial, double tasaInteres, Interfaces.States.IEstadoCuenta? estadoInicial = null)
         {
             var cliente = Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
-            _cuentaService.CrearCuentaAhorros(cliente, numeroCuenta, saldoInicial, tasaInteres, estadoInicial);
+            _cuentaService.CrearCuentaAhorros(cliente, saldoInicial, tasaInteres, estadoInicial);
             return cliente;
         }
 

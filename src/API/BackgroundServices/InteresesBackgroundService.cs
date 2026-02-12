@@ -30,13 +30,13 @@ namespace Fast_Bank.API.BackgroundServices
             while (!stoppingToken.IsCancellationRequested)
             {
                 var ahora = DateTime.UtcNow;
-                
+
                 // Calcular la próxima ejecución a las 00:01 UTC
                 // Si aun no son las 00:01 de hoy, ejecutar hoy. Si no, ejecutar mañana.
                 // Usamos < (no <=) para evitar re-ejecución inmediata si ahora es exactamente 00:01
                 var horaObjetivo = ahora.Date.AddMinutes(1); // 00:01 de hoy
-                var proximaEjecucion = ahora < horaObjetivo 
-                    ? horaObjetivo 
+                var proximaEjecucion = ahora < horaObjetivo
+                    ? horaObjetivo
                     : horaObjetivo.AddDays(1); // 00:01 del día siguiente
                 var tiempoEspera = proximaEjecucion - ahora;
 
@@ -49,7 +49,7 @@ namespace Fast_Bank.API.BackgroundServices
                 {
                     // Esperar hasta las 00:01 del día siguiente
                     await Task.Delay(tiempoEspera, stoppingToken);
-                    
+
                     // Ejecutar la verificación
                     await VerificarYAcreditarInteresesAsync();
                 }
@@ -81,18 +81,18 @@ namespace Fast_Bank.API.BackgroundServices
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<DdContext>();
-                
+
                 try
                 {
                     // Buscar el registro de control en la BD
                     var control = await context.ControlEjecuciones
                         .FirstOrDefaultAsync(c => c.Proceso == "AcreditacionInteresesMensuales");
 
-                    if (control != null && 
-                        control.UltimaEjecucion.Year == ahora.Year && 
+                    if (control != null &&
+                        control.UltimaEjecucion.Year == ahora.Year &&
                         control.UltimaEjecucion.Month == ahora.Month)
                     {
-                        _logger.LogInformation("Intereses ya acreditados este mes ({Year}-{Month})", 
+                        _logger.LogInformation("Intereses ya acreditados este mes ({Year}-{Month})",
                             ahora.Year, ahora.Month);
                         return;
                     }
@@ -116,10 +116,10 @@ namespace Fast_Bank.API.BackgroundServices
                     await context.SaveChangesAsync();
 
                     // Solo si llegamos aquí (SaveChanges exitoso), procedemos a acreditar
-                    _logger.LogInformation("Iniciando acreditación automática de intereses mensuales para {Year}-{Month}", 
+                    _logger.LogInformation("Iniciando acreditación automática de intereses mensuales para {Year}-{Month}",
                         ahora.Year, ahora.Month);
 
-                    var interesesService = scope.ServiceProvider.GetRequiredService<InteresesService>();
+                    var interesesService = scope.ServiceProvider.GetRequiredService<InteresesUseCase>();
                     var resultado = await interesesService.AcreditarInteresesMensualesAsync();
 
                     _logger.LogInformation(

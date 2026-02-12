@@ -6,12 +6,12 @@ using DomainMovimientoService = Domain.Services.MovimientoService;
 
 namespace Fast_Bank.Application.Services;
 
-public class MovimientoService
+public class MovimientoUseCase
 {
     private readonly IDdContext _context;
     private readonly DomainMovimientoService _domainMovimientoService;
 
-    public MovimientoService(IDdContext context, DomainMovimientoService domainMovimientoService)
+    public MovimientoUseCase(IDdContext context, DomainMovimientoService domainMovimientoService)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _domainMovimientoService = domainMovimientoService ?? throw new ArgumentNullException(nameof(domainMovimientoService));

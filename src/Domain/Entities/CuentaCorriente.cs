@@ -14,22 +14,17 @@ namespace Domain.Entities
         {
         }
 
-        public CuentaCorriente(string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro, IEstadoCuenta estadoInicial)
+        public CuentaCorriente(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
             : base(numeroCuenta, saldoInicial, estadoInicial)
         {
-            if (limiteSobregiro != 0)
-            {
-                LimiteSobregiro = limiteSobregiro;
-            }
         }
 
-        public static CuentaCorriente Create(string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro, IEstadoCuenta estadoInicial)
+        public static CuentaCorriente Create(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
         {
             if (string.IsNullOrWhiteSpace(numeroCuenta)) throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
-            if (limiteSobregiro < 0) throw new ArgumentOutOfRangeException(nameof(limiteSobregiro), "Límite de sobregiro no puede ser negativo.");
             if (estadoInicial == null) throw new ArgumentNullException(nameof(estadoInicial));
 
-            return new CuentaCorriente(numeroCuenta, saldoInicial, limiteSobregiro, estadoInicial);
+            return new CuentaCorriente(numeroCuenta, saldoInicial, estadoInicial);
         }
 
         public override void Retirar(decimal monto)

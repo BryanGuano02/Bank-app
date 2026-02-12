@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fast_Bank.Application.Services
 {
-    public class InteresesService
+    public class InteresesUseCase
     {
         private readonly IDdContext _context;
         private readonly Domain.Services.InteresesService _domainInteresesService = new();
 
-        public InteresesService(IDdContext context)
+        public InteresesUseCase(IDdContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

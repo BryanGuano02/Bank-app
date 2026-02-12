@@ -17,12 +17,12 @@ builder.Services.AddDbContext<DdContext>(options =>
 builder.Services.AddScoped<IDdContext>(sp => sp.GetRequiredService<DdContext>());
 
 // Application services
-builder.Services.AddScoped<MovimientoService>();
+builder.Services.AddScoped<MovimientoUseCase>();
 builder.Services.AddScoped<MovimientoQueryService>();
-builder.Services.AddScoped<CuentaService>();
+builder.Services.AddScoped<CuentaUseCase>();
 builder.Services.AddScoped<CuentaQueryService>();
-builder.Services.AddScoped<InteresesService>();
-builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<InteresesUseCase>();
+builder.Services.AddScoped<ClienteUseCase>();
 // Domain services (used by application services)
 builder.Services.AddScoped<Domain.Services.MovimientoService>();
 builder.Services.AddScoped<Domain.Services.ClienteService>();

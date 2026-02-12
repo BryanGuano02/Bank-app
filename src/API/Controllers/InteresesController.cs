@@ -8,9 +8,9 @@ namespace Fast_Bank.API.Controllers
     [Route("api/[controller]")]
     public class InteresesController : ControllerBase
     {
-        private readonly InteresesService _interesesService;
+        private readonly InteresesUseCase _interesesService;
 
-        public InteresesController(InteresesService interesesService)
+        public InteresesController(InteresesUseCase interesesService)
         {
             _interesesService = interesesService;
         }
@@ -24,7 +24,7 @@ namespace Fast_Bank.API.Controllers
 
                 return Ok(new
                 {
-                    Mensaje = "Proceso de acreditación de intereses completado",
+                    Mensaje = "Proceso de acreditaciï¿½n de intereses completado",
                     CuentasProcesadas = resultado.CuentasProcesadas,
                     CuentasOmitidas = resultado.CuentasOmitidas,
                     MontoTotalAcreditado = resultado.MontoTotalAcreditado,
@@ -47,7 +47,7 @@ namespace Fast_Bank.API.Controllers
 
                 return Ok(new
                 {
-                    Mensaje = "Interés acreditado exitosamente",
+                    Mensaje = "Interï¿½s acreditado exitosamente",
                     NumeroCuenta = detalle.NumeroCuenta,
                     SaldoAnterior = detalle.SaldoAnterior,
                     InteresAcreditado = detalle.MontoInteres,
