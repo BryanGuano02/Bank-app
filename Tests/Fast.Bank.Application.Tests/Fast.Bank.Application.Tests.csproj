@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Application\Fast-Bank.Application.csproj" />
-    <ProjectReference Include="..\..\Domain\Fast-Bank.Domain.csproj" />
-    <ProjectReference Include="..\..\Infrastructure\Fast-Bank.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Application\Fast-Bank.Application.csproj" />
+    <ProjectReference Include="..\..\src\Domain\Fast-Bank.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\Fast-Bank.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
