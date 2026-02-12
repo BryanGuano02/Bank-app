@@ -33,12 +33,12 @@ namespace Domain.Services
             }
         }
 
-        public CuentaCorriente CrearCuentaCorriente(Cliente cliente, decimal saldoInicial, Interfaces.States.IEstadoCuenta? estadoInicial = null)
+        public CuentaCorriente CrearCuentaCorriente(Cliente cliente, decimal saldoInicial)
         {
             if (cliente == null) throw new ArgumentNullException(nameof(cliente));
 
             var numeroCuenta = GenerarProximoNumeroCuenta();
-            var estado = estadoInicial ?? new Domain.Patterns.State.EstadoCuentaActiva();
+            var estado = new Patterns.State.EstadoCuentaActiva();
 
             var cuenta = CuentaCorriente.Create(numeroCuenta, saldoInicial, estado);
 
@@ -48,13 +48,13 @@ namespace Domain.Services
             return cuenta;
         }
 
-        public CuentaAhorros CrearCuentaAhorros(Cliente cliente, decimal saldoInicial, double tasaInteres, Interfaces.States.IEstadoCuenta? estadoInicial = null)
+        public CuentaAhorros CrearCuentaAhorros(Cliente cliente, decimal saldoInicial, double tasaInteres)
         {
             if (cliente == null) throw new ArgumentNullException(nameof(cliente));
             if (tasaInteres < 0) throw new ArgumentOutOfRangeException(nameof(tasaInteres), "Tasa de interés no puede ser negativa.");
 
             var numeroCuenta = GenerarProximoNumeroCuenta();
-            var estado = estadoInicial ?? new Domain.Patterns.State.EstadoCuentaActiva();
+            var estado = new Patterns.State.EstadoCuentaActiva();
 
             var cuenta = CuentaAhorros.Create(numeroCuenta, saldoInicial, tasaInteres, estado);
 

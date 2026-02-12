@@ -44,20 +44,16 @@ public class ClienteUseCase
 
     public async Task<Cliente> CrearClienteConCuentaCorrienteAsync(
         string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro)
+        decimal saldoInicial)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
-        if (string.IsNullOrWhiteSpace(numeroCuenta)) throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
 
         var existeCliente = await _context.Clientes.FindAsync(cedula);
         if (existeCliente != null) throw new InvalidOperationException("El cliente ya existe.");
 
-        var existeCuenta = await _context.Cuentas.FindAsync(numeroCuenta);
-        if (existeCuenta != null) throw new InvalidOperationException("El número de cuenta ya existe.");
-
         var cliente = _domainClienteService.CrearClienteConCuentaCorriente(
             cedula, nombre, apellido, direccion, correo, telefono,
-            numeroCuenta, saldoInicial, limiteSobregiro);
+            saldoInicial);
 
         await _context.Clientes.AddAsync(cliente);
         await _context.SaveChangesAsync();
@@ -67,20 +63,16 @@ public class ClienteUseCase
 
     public async Task<Cliente> CrearClienteConCuentaAhorrosAsync(
         string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        string numeroCuenta, decimal saldoInicial, double tasaInteres)
+        decimal saldoInicial, double tasaInteres)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
-        if (string.IsNullOrWhiteSpace(numeroCuenta)) throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
 
         var existeCliente = await _context.Clientes.FindAsync(cedula);
         if (existeCliente != null) throw new InvalidOperationException("El cliente ya existe.");
 
-        var existeCuenta = await _context.Cuentas.FindAsync(numeroCuenta);
-        if (existeCuenta != null) throw new InvalidOperationException("El número de cuenta ya existe.");
-
         var cliente = _domainClienteService.CrearClienteConCuentaAhorros(
             cedula, nombre, apellido, direccion, correo, telefono,
-            numeroCuenta, saldoInicial, tasaInteres);
+            saldoInicial, tasaInteres);
 
         await _context.Clientes.AddAsync(cliente);
         await _context.SaveChangesAsync();
