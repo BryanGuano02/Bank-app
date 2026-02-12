@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CEA09484-30F6-4D44-02F6-822E06DBC57C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fast.Bank.Application.Tests", "src\Tests\Fast.Bank.Application.Tests\Fast.Bank.Application.Tests.csproj", "{CEBDD7A9-4F6D-4287-9867-2119D1251281}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fast.Bank.Application.Tests", "Tests\Fast.Bank.Application.Tests\Fast.Bank.Application.Tests.csproj", "{CEBDD7A9-4F6D-4287-9867-2119D1251281}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
