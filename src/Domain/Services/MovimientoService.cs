@@ -11,7 +11,7 @@ namespace Domain.Services
         }
 
         // Crea y ejecuta la lógica de un depósito. No persiste ni accede a la BD.
-        public Movimiento CrearYEjecutarDeposito(string idMovimiento, Cuenta destino, decimal monto, string descripcion)
+        public Movimiento Depositar(string idMovimiento, Cuenta destino, decimal monto, string descripcion)
         {
             if (destino == null) throw new ArgumentNullException(nameof(destino));
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.", nameof(idMovimiento));
@@ -25,7 +25,7 @@ namespace Domain.Services
         }
 
         // Crea y ejecuta la lógica de un retiro. No persiste ni accede a la BD.
-        public Movimiento CrearYEjecutarRetiro(string idMovimiento, Cuenta origen, decimal monto, string descripcion)
+        public Movimiento Retirar(string idMovimiento, Cuenta origen, decimal monto, string descripcion)
         {
             if (origen == null) throw new ArgumentNullException(nameof(origen));
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.", nameof(idMovimiento));
@@ -43,7 +43,7 @@ namespace Domain.Services
         }
 
         // Crea y ejecuta la lógica de una transferencia. No persiste ni accede a la BD.
-        public Movimiento CrearYEjecutarTransferencia(string idMovimiento, Cuenta origen, Cuenta destino, decimal monto, string descripcion)
+        public Movimiento Transferir(string idMovimiento, Cuenta origen, Cuenta destino, decimal monto, string descripcion)
         {
             if (origen == null) throw new ArgumentNullException(nameof(origen));
             if (destino == null) throw new ArgumentNullException(nameof(destino));

@@ -25,7 +25,7 @@ public class MovimientoService
         var destino = await _context.Cuentas.FindAsync(numeroCuentaDestino);
         if (destino == null) throw new InvalidOperationException("Cuenta destino no encontrada.");
 
-        var movimiento = _domainMovimientoService.CrearYEjecutarDeposito(Guid.NewGuid().ToString(), destino, monto, descripcion ?? string.Empty);
+        var movimiento = _domainMovimientoService.Depositar(Guid.NewGuid().ToString(), destino, monto, descripcion ?? string.Empty);
 
         await _context.Movimientos.AddAsync(movimiento);
         await _context.SaveChangesAsync();
@@ -41,7 +41,7 @@ public class MovimientoService
         var origen = await _context.Cuentas.FindAsync(numeroCuentaOrigen);
         if (origen == null) throw new InvalidOperationException("Cuenta origen no encontrada.");
 
-        var movimiento = _domainMovimientoService.CrearYEjecutarRetiro(Guid.NewGuid().ToString(), origen, monto, descripcion ?? string.Empty);
+        var movimiento = _domainMovimientoService.Retirar(Guid.NewGuid().ToString(), origen, monto, descripcion ?? string.Empty);
 
         await _context.Movimientos.AddAsync(movimiento);
         await _context.SaveChangesAsync();
@@ -61,7 +61,7 @@ public class MovimientoService
         var destino = await _context.Cuentas.FindAsync(numeroCuentaDestino);
         if (destino == null) throw new InvalidOperationException("Cuenta destino no encontrada.");
 
-        var movimiento = _domainMovimientoService.CrearYEjecutarTransferencia(Guid.NewGuid().ToString(), origen, destino, monto, descripcion ?? string.Empty);
+        var movimiento = _domainMovimientoService.Transferir(Guid.NewGuid().ToString(), origen, destino, monto, descripcion ?? string.Empty);
 
         await _context.Movimientos.AddAsync(movimiento);
         await _context.SaveChangesAsync();
