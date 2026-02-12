@@ -4,15 +4,31 @@ namespace Domain.Services
 {
     public class ClienteService
     {
+        private readonly CuentaService _cuentaService;
 
-        public ClienteService()
+        public ClienteService(CuentaService cuentaService)
         {
-
+            _cuentaService = cuentaService ?? throw new ArgumentNullException(nameof(cuentaService));
         }
 
-        public Cliente CrearCliente(string cedula, string nombre, string apellido, string direccion, string correo, string telefono)
+        public Cliente CrearClienteConCuentaCorriente(
+            string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
+            string numeroCuenta, decimal saldoInicial, decimal limiteSobregiro,
+            Interfaces.States.IEstadoCuenta? estadoInicial = null)
         {
-            return Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
+            var cliente = Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
+            _cuentaService.CrearCuentaCorriente(cliente, numeroCuenta, saldoInicial, limiteSobregiro, estadoInicial);
+            return cliente;
+        }
+
+        public Cliente CrearClienteConCuentaAhorros(
+            string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
+            string numeroCuenta, decimal saldoInicial, double tasaInteres,
+            Interfaces.States.IEstadoCuenta? estadoInicial = null)
+        {
+            var cliente = Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
+            _cuentaService.CrearCuentaAhorros(cliente, numeroCuenta, saldoInicial, tasaInteres, estadoInicial);
+            return cliente;
         }
 
         public Cliente ActualizarCliente(Cliente cliente, string nombre, string apellido, string direccion, string correo, string telefono)
