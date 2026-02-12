@@ -94,6 +94,7 @@ public class ClienteController : ControllerBase
                     TipoCuenta = "Corriente",
                     Saldo = cliente.Cuenta?.Saldo,
                     LimiteSobregiro = cuentaCorriente?.LimiteSobregiro,
+                    InteresSobregiro = cuentaCorriente?.InteresSobregiro,
                     FechaApertura = cliente.Cuenta?.FechaApertura
                 }
             });
