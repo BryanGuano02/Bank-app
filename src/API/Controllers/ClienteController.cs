@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Fast_Bank.Application.Services;
 using Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace Fast_Bank.API.Controllers;
 
@@ -257,8 +258,14 @@ public class ClienteController : ControllerBase
         public string TipoCuenta { get; set; } = string.Empty;
         public decimal Saldo { get; set; }
         public DateTime FechaApertura { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public decimal? LimiteSobregiro { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public decimal? InteresSobregiro { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TasaInteres { get; set; }
     }
 
