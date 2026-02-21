@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities;
+using Fast_Bank.Application.DTOs.Cuenta;
 using Fast_Bank.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,27 +18,27 @@ namespace Fast_Bank.Application.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<CuentaDto?> ObtenerPorNumeroAsync(string numeroCuenta)
+        public async Task<CuentaDtoBase?> ObtenerPorNumeroAsync(string numeroCuenta)
         {
             var cuenta = await _context.Cuentas.FindAsync(numeroCuenta);
-            
+
             if (cuenta == null)
                 return null;
 
             return MapToDto(cuenta);
         }
 
-        public async Task<IEnumerable<CuentaDto>> ObtenerTodasAsync()
+        public async Task<IEnumerable<CuentaDtoBase>> ObtenerTodasAsync()
         {
             var cuentas = await _context.Cuentas.ToListAsync();
             return cuentas.Select(MapToDto);
         }
 
-        private static CuentaDto MapToDto(Cuenta cuenta)
+        private static CuentaDtoBase MapToDto(Cuenta cuenta)
         {
             if (cuenta is CuentaCorriente cuentaCorriente)
             {
-                return new CuentaDto
+                return new CuentaCorrienteDto
                 {
                     NumeroCuenta = cuenta.NumeroCuenta,
                     TipoCuenta = "Corriente",
@@ -49,7 +50,7 @@ namespace Fast_Bank.Application.Services
             }
             else if (cuenta is CuentaAhorros cuentaAhorros)
             {
-                return new CuentaDto
+                return new CuentaAhorrosDto
                 {
                     NumeroCuenta = cuenta.NumeroCuenta,
                     TipoCuenta = "Ahorros",
@@ -60,7 +61,7 @@ namespace Fast_Bank.Application.Services
             }
             else
             {
-                return new CuentaDto
+                return new CuentaDtoBase
                 {
                     NumeroCuenta = cuenta.NumeroCuenta,
                     TipoCuenta = "Desconocido",
@@ -69,19 +70,5 @@ namespace Fast_Bank.Application.Services
                 };
             }
         }
-    }
-
-    // DTO
-    public class CuentaDto
-    {
-        public string NumeroCuenta { get; set; } = string.Empty;
-        public string TipoCuenta { get; set; } = string.Empty;
-        public decimal Saldo { get; set; }
-        public DateTime FechaApertura { get; set; }
-        
-        // Propiedades opcionales según tipo de cuenta
-        public double? TasaInteres { get; set; }
-        public decimal? LimiteSobregiro { get; set; }
-        public decimal? SaldoDisponible { get; set; }
     }
 }
