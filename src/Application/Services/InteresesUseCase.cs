@@ -72,43 +72,6 @@ namespace Fast_Bank.Application.Services
             return resultado;
         }
 
-        public async Task<DetalleAcreditacion> AcreditarInteresACuentaAsync(string numeroCuenta)
-        {
-            if (string.IsNullOrWhiteSpace(numeroCuenta))
-                throw new ArgumentException("N�mero de cuenta inv�lido.", nameof(numeroCuenta));
-
-            var cuenta = await _context.CuentasAhorros
-                .FirstOrDefaultAsync(c => c.NumeroCuenta == numeroCuenta);
-
-            if (cuenta == null)
-                throw new InvalidOperationException($"No se encontr� cuenta de ahorros con n�mero: {numeroCuenta}");
-
-            var saldoAnterior = cuenta.Saldo;
-            var montoInteres = _domainInteresesService.CalcularInteresMensual(cuenta);
-
-            if (montoInteres <= 0)
-                throw new InvalidOperationException("El monto de inter�s calculado es cero o negativo.");
-
-            var movimiento = _domainInteresesService.CrearYEjecutarAcreditacionInteres(
-                Guid.NewGuid().ToString(),
-                cuenta,
-                montoInteres
-            );
-
-            await _context.Movimientos.AddAsync(movimiento);
-            await _context.SaveChangesAsync();
-
-            return new DetalleAcreditacion
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                SaldoAnterior = saldoAnterior,
-                MontoInteres = montoInteres,
-                SaldoNuevo = cuenta.Saldo,
-                TasaAplicada = cuenta.TasaInteres
-            };
-        }
-
-
         // DTOs de respuesta
         public class AcreditacionInteresesResult
         {
@@ -190,45 +153,6 @@ namespace Fast_Bank.Application.Services
             await _context.SaveChangesAsync();
 
             return resultado;
-        }
-
-        public async Task<DetalleCobro> AcreditarInteresSobregiroACuenta(string numeroCuenta)
-        {
-            if (string.IsNullOrWhiteSpace(numeroCuenta))
-                throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
-
-            var cuenta = await _context.CuentasCorrientes
-                .FirstOrDefaultAsync(c => c.NumeroCuenta == numeroCuenta);
-
-            if (cuenta == null)
-                throw new InvalidOperationException($"No se encontró cuenta corriente con número: {numeroCuenta}");
-
-            if (cuenta.Saldo >= 0)
-                throw new InvalidOperationException("La cuenta no está en sobregiro. Solo se cobran intereses cuando el saldo es negativo.");
-
-            var saldoAnterior = cuenta.Saldo;
-            var montoInteres = _domainInteresesService.CalcularInteresSobregiro(cuenta);
-
-            if (montoInteres <= 0)
-                throw new InvalidOperationException("El monto de interés calculado es cero o negativo.");
-
-            var movimiento = _domainInteresesService.CrearYEjecutarCargoInteresSobregiro(
-                Guid.NewGuid().ToString(),
-                cuenta,
-                montoInteres
-            );
-
-            await _context.Movimientos.AddAsync(movimiento);
-            await _context.SaveChangesAsync();
-
-            return new DetalleCobro
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                SaldoAnterior = saldoAnterior + montoInteres, // Era menos negativo
-                MontoInteres = montoInteres,
-                SaldoNuevo = cuenta.Saldo,
-                TasaAplicada = cuenta.InteresSobregiro
-            };
         }
 
         // DTOs adicionales para sobregiro

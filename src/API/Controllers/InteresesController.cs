@@ -39,33 +39,6 @@ namespace Fast_Bank.API.Controllers
             }
         }
 
-        [HttpPost("ahorros/acreditar/{numeroCuenta}")]
-        public async Task<IActionResult> AcreditarInteresACuenta(string numeroCuenta)
-        {
-            try
-            {
-                var detalle = await _interesesService.AcreditarInteresACuentaAsync(numeroCuenta);
-
-                return Ok(new
-                {
-                    Mensaje = "Inter�s acreditado exitosamente",
-                    NumeroCuenta = detalle.NumeroCuenta,
-                    SaldoAnterior = detalle.SaldoAnterior,
-                    InteresAcreditado = detalle.MontoInteres,
-                    SaldoNuevo = detalle.SaldoNuevo,
-                    TasaAplicada = $"{detalle.TasaAplicada:P2}"
-                });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
         // Endpoints para cuentas corrientes (cobrar intereses de sobregiro)
         [HttpPost("sobregiro/cobrar-todos")]
         public async Task<IActionResult> CobrarInteresSobregiroATodas()
@@ -87,33 +60,6 @@ namespace Fast_Bank.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = "Error al procesar intereses de sobregiro", detalle = ex.Message });
-            }
-        }
-
-        [HttpPost("sobregiro/cobrar/{numeroCuenta}")]
-        public async Task<IActionResult> CobrarInteresSobregiroACuenta(string numeroCuenta)
-        {
-            try
-            {
-                var detalle = await _interesesService.AcreditarInteresSobregiroACuenta(numeroCuenta);
-
-                return Ok(new
-                {
-                    Mensaje = "Inter�s de sobregiro cobrado exitosamente",
-                    NumeroCuenta = detalle.NumeroCuenta,
-                    SaldoAnterior = detalle.SaldoAnterior,
-                    InteresCobrado = detalle.MontoInteres,
-                    SaldoNuevo = detalle.SaldoNuevo,
-                    TasaAplicada = $"{detalle.TasaAplicada:P2}"
-                });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { error = ex.Message });
             }
         }
     }
