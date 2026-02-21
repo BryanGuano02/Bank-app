@@ -6,27 +6,27 @@ namespace Domain.Entities
 {
     public class CuentaAhorros : Cuenta
     {
+        public const double TASA_INTERES_AHORROS = 3.0; // 3%
         public double TasaInteres { get; private set; }
 
         // Parameterless constructor for EF Core
         protected CuentaAhorros() : base()
         {
-            TasaInteres = 0;
+            TasaInteres = TASA_INTERES_AHORROS;
         }
 
-        public CuentaAhorros(string numeroCuenta, decimal saldoInicial, double tasaInteres, IEstadoCuenta estadoInicial)
+        public CuentaAhorros(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
             : base(numeroCuenta, saldoInicial, estadoInicial)
         {
-            TasaInteres = tasaInteres;
+            TasaInteres = TASA_INTERES_AHORROS;
         }
 
-        public static CuentaAhorros Create(string numeroCuenta, decimal saldoInicial, double tasaInteres, IEstadoCuenta estadoInicial)
+        public static CuentaAhorros Create(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
         {
             if (string.IsNullOrWhiteSpace(numeroCuenta)) throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
-            if (tasaInteres < 0) throw new ArgumentOutOfRangeException(nameof(tasaInteres), "Tasa de interés no puede ser negativa.");
             if (estadoInicial == null) throw new ArgumentNullException(nameof(estadoInicial));
 
-            return new CuentaAhorros(numeroCuenta, saldoInicial, tasaInteres, estadoInicial);
+            return new CuentaAhorros(numeroCuenta, saldoInicial, estadoInicial);
         }
 
         public override void Retirar(decimal monto)

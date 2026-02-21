@@ -6,8 +6,9 @@ namespace Domain.Entities
 {
     public class CuentaCorriente : Cuenta
     {
+        public const decimal TASA_INTERES_SOBREGIRO = 0.22m; // 22%
         public decimal LimiteSobregiro { get; private set; } = 200m;
-        public decimal InteresSobregiro { get; private set; } = 0.02m;
+        public decimal InteresSobregiro { get; private set; } = TASA_INTERES_SOBREGIRO;
 
         // Parameterless constructor for EF Core
         protected CuentaCorriente() : base()

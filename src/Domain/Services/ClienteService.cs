@@ -22,11 +22,19 @@ namespace Domain.Services
 
         public Cliente CrearClienteConCuentaAhorros(
             string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-            decimal saldoInicial, double tasaInteres)
+            decimal saldoInicial)
         {
             var cliente = Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
-            _cuentaService.CrearCuentaAhorros(cliente, saldoInicial, tasaInteres);
+            _cuentaService.CrearCuentaAhorros(cliente, saldoInicial);
             return cliente;
+        }
+
+        public void AsignarTarjetaCredito(Cliente cliente, TarjetaCredito tarjeta)
+        {
+            if (cliente == null) throw new ArgumentNullException(nameof(cliente));
+            if (tarjeta == null) throw new ArgumentNullException(nameof(tarjeta));
+
+            cliente.SetTarjetaCredito(tarjeta);
         }
 
         public Cliente ActualizarCliente(Cliente cliente, string nombre, string apellido, string direccion, string correo, string telefono)

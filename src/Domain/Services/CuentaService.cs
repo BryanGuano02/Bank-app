@@ -48,15 +48,14 @@ namespace Domain.Services
             return cuenta;
         }
 
-        public CuentaAhorros CrearCuentaAhorros(Cliente cliente, decimal saldoInicial, double tasaInteres)
+        public CuentaAhorros CrearCuentaAhorros(Cliente cliente, decimal saldoInicial)
         {
             if (cliente == null) throw new ArgumentNullException(nameof(cliente));
-            if (tasaInteres < 0) throw new ArgumentOutOfRangeException(nameof(tasaInteres), "Tasa de interés no puede ser negativa.");
 
             var numeroCuenta = GenerarProximoNumeroCuenta();
             var estado = new Patterns.State.EstadoCuentaActiva();
 
-            var cuenta = CuentaAhorros.Create(numeroCuenta, saldoInicial, tasaInteres, estado);
+            var cuenta = CuentaAhorros.Create(numeroCuenta, saldoInicial, estado);
 
             cuenta.SetCliente(cliente);
             cliente.SetCuenta(cuenta);

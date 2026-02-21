@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Fast_Bank.Application.Services;
 using Domain.Entities;
+using Domain.Enums;
 using System.Text.Json.Serialization;
 
 namespace Fast_Bank.API.Controllers;
@@ -17,6 +18,37 @@ public class ClienteController : ControllerBase
         _clienteService = clienteService;
     }
 
+    // ===== NUEVOS DTOs UNIFICADOS =====
+
+    public class CrearClienteConCuentaRequest
+    {
+        public string Cedula { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Direccion { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public decimal SaldoInicial { get; set; }
+        public TipoCuenta TipoCuenta { get; set; }
+    }
+
+    public class CrearClienteConCuentaYTarjetaRequest
+    {
+        public string Cedula { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Direccion { get; set; } = string.Empty;
+        public string Correo { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public decimal SaldoInicial { get; set; }
+        public TipoCuenta TipoCuenta { get; set; }
+        public string NumeroTarjeta { get; set; } = string.Empty;
+        public double LimiteCredito { get; set; }
+        public double TasaInteresMensual { get; set; } = 2.5;
+    }
+
+    // DTOs antiguos para compatibilidad (Obsoletos)
+    [Obsolete("Usar CrearClienteConCuentaRequest con enum TipoCuenta")]
     public class CrearClienteConCuentaCorrienteRequest
     {
         public string Cedula { get; set; } = string.Empty;
@@ -28,6 +60,7 @@ public class ClienteController : ControllerBase
         public decimal SaldoInicial { get; set; }
     }
 
+    [Obsolete("Usar CrearClienteConCuentaRequest con enum TipoCuenta")]
     public class CrearClienteConCuentaAhorrosRequest
     {
         public string Cedula { get; set; } = string.Empty;
@@ -37,7 +70,6 @@ public class ClienteController : ControllerBase
         public string Correo { get; set; } = string.Empty;
         public string Telefono { get; set; } = string.Empty;
         public decimal SaldoInicial { get; set; }
-        public double TasaInteres { get; set; } = 2;
     }
 
     public class ActualizarClienteRequest
@@ -49,22 +81,92 @@ public class ClienteController : ControllerBase
         public string Telefono { get; set; } = string.Empty;
     }
 
-    // DTOs para creación de cuentas a través del cliente
-    public class CrearCuentaAhorrosRequest
+    // ===== NUEVOS ENDPOINTS UNIFICADOS =====
+
+    [HttpPost("con-cuenta")]
+    public async Task<IActionResult> CrearClienteConCuenta([FromBody] CrearClienteConCuentaRequest req)
     {
-        public string NumeroCuenta { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
-        public double TasaInteres { get; set; } = 2;
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.Cedula)) return BadRequest("Cédula es requerida.");
+
+        try
+        {
+            var cliente = await _clienteService.CrearClienteConCuentaAsync(
+                req.Cedula,
+                req.Nombre,
+                req.Apellido,
+                req.Direccion,
+                req.Correo,
+                req.Telefono,
+                req.SaldoInicial,
+                req.TipoCuenta
+            );
+
+            var location = $"/api/cliente/{cliente.Cedula}";
+            return Created(location, new
+            {
+                Mensaje = $"Cliente y cuenta {req.TipoCuenta} creados exitosamente",
+                Cliente = MapToDto(cliente)
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
-    public class CrearCuentaCorrienteRequest
+    [HttpPost("con-cuenta-y-tarjeta")]
+    public async Task<IActionResult> CrearClienteConCuentaYTarjeta([FromBody] CrearClienteConCuentaYTarjetaRequest req)
     {
-        public string NumeroCuenta { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
-        public decimal LimiteSobregiro { get; set; } = 500;
+        if (req == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(req.Cedula)) return BadRequest("Cédula es requerida.");
+        if (string.IsNullOrWhiteSpace(req.NumeroTarjeta)) return BadRequest("Número de tarjeta es requerido.");
+
+        try
+        {
+            var cliente = await _clienteService.CrearClienteConCuentaYTarjetaAsync(
+                req.Cedula,
+                req.Nombre,
+                req.Apellido,
+                req.Direccion,
+                req.Correo,
+                req.Telefono,
+                req.SaldoInicial,
+                req.TipoCuenta,
+                req.NumeroTarjeta,
+                req.LimiteCredito,
+                req.TasaInteresMensual
+            );
+
+            var location = $"/api/cliente/{cliente.Cedula}";
+
+            // Recargar cliente con relaciones
+            var clienteCompleto = await _clienteService.GetClienteAsync(cliente.Cedula);
+
+            return Created(location, new
+            {
+                Mensaje = $"Cliente, cuenta {req.TipoCuenta} y tarjeta de crédito creados exitosamente",
+                Cliente = MapToDtoConTarjeta(clienteCompleto!)
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
+
+    // ===== ENDPOINTS ANTIGUOS (Deprecated pero funcionales) =====
 
     [HttpPost("con-cuenta-corriente")]
+    [Obsolete("Usar POST /api/cliente/con-cuenta con TipoCuenta=Corriente")]
     public async Task<IActionResult> CrearConCuentaCorriente([FromBody] CrearClienteConCuentaCorrienteRequest req)
     {
         if (req == null) return BadRequest();
@@ -111,6 +213,7 @@ public class ClienteController : ControllerBase
     }
 
     [HttpPost("con-cuenta-ahorros")]
+    [Obsolete("Usar POST /api/cliente/con-cuenta con TipoCuenta=Ahorros")]
     public async Task<IActionResult> CrearConCuentaAhorros([FromBody] CrearClienteConCuentaAhorrosRequest req)
     {
         if (req == null) return BadRequest();
@@ -125,8 +228,7 @@ public class ClienteController : ControllerBase
                 req.Direccion,
                 req.Correo,
                 req.Telefono,
-                req.SaldoInicial,
-                req.TasaInteres
+                req.SaldoInicial
             );
 
             var cuentaAhorros = cliente.Cuenta as CuentaAhorros;
@@ -155,6 +257,8 @@ public class ClienteController : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    // ===== ENDPOINTS CRUD =====
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -204,6 +308,8 @@ public class ClienteController : ControllerBase
         }
     }
 
+    // ===== MAPPERS =====
+
     private ClienteDto MapToDto(Cliente cliente)
     {
         CuentaDto? cuentaDto = null;
@@ -241,6 +347,40 @@ public class ClienteController : ControllerBase
         };
     }
 
+    private ClienteDtoConTarjeta MapToDtoConTarjeta(Cliente cliente)
+    {
+        var clienteBase = MapToDto(cliente);
+
+        TarjetaDto? tarjetaDto = null;
+        if (cliente.TarjetaCredito != null)
+        {
+            tarjetaDto = new TarjetaDto
+            {
+                NumeroTarjeta = cliente.TarjetaCredito.NumeroTarjeta,
+                LimiteCredito = cliente.TarjetaCredito.LimiteCredito,
+                SaldoUtilizado = cliente.TarjetaCredito.SaldoUtilizado,
+                CreditoDisponible = cliente.TarjetaCredito.CreditoDisponible,
+                TasaInteresMensual = cliente.TarjetaCredito.TasaInteresMensual,
+                FechaEmision = cliente.TarjetaCredito.FechaEmision,
+                FechaVencimiento = cliente.TarjetaCredito.FechaVencimiento
+            };
+        }
+
+        return new ClienteDtoConTarjeta
+        {
+            Cedula = clienteBase.Cedula,
+            Nombre = clienteBase.Nombre,
+            Apellido = clienteBase.Apellido,
+            Direccion = clienteBase.Direccion,
+            Correo = clienteBase.Correo,
+            Telefono = clienteBase.Telefono,
+            Cuenta = clienteBase.Cuenta,
+            TarjetaCredito = tarjetaDto
+        };
+    }
+
+    // ===== DTOs DE RESPUESTA =====
+
     public class ClienteDto
     {
         public string Cedula { get; set; } = string.Empty;
@@ -250,6 +390,11 @@ public class ClienteController : ControllerBase
         public string Correo { get; set; } = string.Empty;
         public string Telefono { get; set; } = string.Empty;
         public CuentaDto? Cuenta { get; set; }
+    }
+
+    public class ClienteDtoConTarjeta : ClienteDto
+    {
+        public TarjetaDto? TarjetaCredito { get; set; }
     }
 
     public class CuentaDto
@@ -269,4 +414,14 @@ public class ClienteController : ControllerBase
         public double? TasaInteres { get; set; }
     }
 
+    public class TarjetaDto
+    {
+        public string NumeroTarjeta { get; set; } = string.Empty;
+        public double LimiteCredito { get; set; }
+        public double SaldoUtilizado { get; set; }
+        public double CreditoDisponible { get; set; }
+        public double TasaInteresMensual { get; set; }
+        public DateTime FechaEmision { get; set; }
+        public DateTime FechaVencimiento { get; set; }
+    }
 }

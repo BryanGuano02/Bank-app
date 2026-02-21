@@ -19,20 +19,20 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CalcularInteresMensual_ConDatosValidos_RetornaInteresRedondeado()
         {
             // Arrange
-            var cuenta = new CuentaAhorros("A100", 1000m, 1.5, new EstadoCuentaActiva());
+            var cuenta = CuentaAhorros.Create("A100", 1000m, new EstadoCuentaActiva());
 
             // Act
             var interes = _service.CalcularInteresMensual(cuenta);
 
             // Assert
-            Assert.Equal(1.25m, interes);
+            Assert.Equal(2.5m, interes); // 1000 * 3% / 12 = 2.5
         }
 
         [Fact]
         public void CrearYEjecutarAcreditacionInteres_ConDatosValidos_AcreditaSaldo()
         {
             // Arrange
-            var cuenta = new CuentaAhorros("A200", 500m, 2.4, new EstadoCuentaActiva());
+            var cuenta = CuentaAhorros.Create("A200", 500m, new EstadoCuentaActiva());
             var id = Guid.NewGuid().ToString();
             var monto = 5.12m;
 
@@ -62,7 +62,7 @@ namespace Fast.Bank.Application.Tests.Domain
         [InlineData("   ")]
         public void CrearYEjecutarAcreditacionInteres_IdInvalido_DebeLanzarArgumentException(string id)
         {
-            var cuenta = new CuentaAhorros("A300", 100m, 1.0, new EstadoCuentaActiva());
+            var cuenta = CuentaAhorros.Create("A300", 100m, new EstadoCuentaActiva());
             var monto = 1m;
 
             Assert.Throws<ArgumentException>(() => _service.CrearYEjecutarAcreditacionInteres(id!, cuenta, monto));
@@ -73,7 +73,7 @@ namespace Fast.Bank.Application.Tests.Domain
         [InlineData(-1)]
         public void CrearYEjecutarAcreditacionInteres_MontoInvalido_DebeLanzarArgumentOutOfRange(decimal monto)
         {
-            var cuenta = new CuentaAhorros("A400", 100m, 1.0, new EstadoCuentaActiva());
+            var cuenta = CuentaAhorros.Create("A400", 100m, new EstadoCuentaActiva());
             var id = Guid.NewGuid().ToString();
 
             Assert.Throws<ArgumentOutOfRangeException>(() => _service.CrearYEjecutarAcreditacionInteres(id, cuenta, monto));

@@ -2,11 +2,19 @@
 using Fast_Bank.Infrastructure.Persistence;
 using Fast_Bank.Application.Services;
 using Fast_Bank.API.BackgroundServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Configurar para que los enums se serialicen como strings en minúsculas
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+    });
 
 // Configure EF Core with SQLite using the DefaultConnection string
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
