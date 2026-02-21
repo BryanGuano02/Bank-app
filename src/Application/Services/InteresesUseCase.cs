@@ -137,5 +137,117 @@ namespace Fast_Bank.Application.Services
             public decimal InteresCalculado { get; set; }
             public decimal SaldoProyectado { get; set; }
         }
+
+        // Métodos para intereses de sobregiro en cuentas corrientes
+        public async Task<AcreditacionInteresSobregiroResult> AcreditarInteresSobregiroATodas()
+        {
+            var resultado = new AcreditacionInteresSobregiroResult();
+
+            var cuentasCorrientes = await _context.CuentasCorrientes
+                .Where(c => c.Saldo < 0) // Solo cuentas en sobregiro
+                .ToListAsync();
+
+            foreach (var cuenta in cuentasCorrientes)
+            {
+                try
+                {
+                    // Calcular interés de sobregiro
+                    var montoInteres = _domainInteresesService.CalcularInteresSobregiro(cuenta);
+
+                    // Si el interés es mayor a cero, cobrarlo
+                    if (montoInteres > 0)
+                    {
+                        var movimiento = _domainInteresesService.CrearYEjecutarCargoInteresSobregiro(
+                            Guid.NewGuid().ToString(),
+                            cuenta,
+                            montoInteres
+                        );
+
+                        await _context.Movimientos.AddAsync(movimiento);
+
+                        resultado.CuentasProcesadas++;
+                        resultado.MontoTotalCobrado += montoInteres;
+                        resultado.DetallesPorCuenta.Add(new DetalleCobro
+                        {
+                            NumeroCuenta = cuenta.NumeroCuenta,
+                            SaldoAnterior = cuenta.Saldo + montoInteres, // Era menos negativo
+                            MontoInteres = montoInteres,
+                            SaldoNuevo = cuenta.Saldo,
+                            TasaAplicada = cuenta.InteresSobregiro
+                        });
+                    }
+                    else
+                    {
+                        resultado.CuentasOmitidas++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    resultado.Errores.Add($"Error en cuenta {cuenta.NumeroCuenta}: {ex.Message}");
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return resultado;
+        }
+
+        public async Task<DetalleCobro> AcreditarInteresSobregiroACuenta(string numeroCuenta)
+        {
+            if (string.IsNullOrWhiteSpace(numeroCuenta))
+                throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
+
+            var cuenta = await _context.CuentasCorrientes
+                .FirstOrDefaultAsync(c => c.NumeroCuenta == numeroCuenta);
+
+            if (cuenta == null)
+                throw new InvalidOperationException($"No se encontró cuenta corriente con número: {numeroCuenta}");
+
+            if (cuenta.Saldo >= 0)
+                throw new InvalidOperationException("La cuenta no está en sobregiro. Solo se cobran intereses cuando el saldo es negativo.");
+
+            var saldoAnterior = cuenta.Saldo;
+            var montoInteres = _domainInteresesService.CalcularInteresSobregiro(cuenta);
+
+            if (montoInteres <= 0)
+                throw new InvalidOperationException("El monto de interés calculado es cero o negativo.");
+
+            var movimiento = _domainInteresesService.CrearYEjecutarCargoInteresSobregiro(
+                Guid.NewGuid().ToString(),
+                cuenta,
+                montoInteres
+            );
+
+            await _context.Movimientos.AddAsync(movimiento);
+            await _context.SaveChangesAsync();
+
+            return new DetalleCobro
+            {
+                NumeroCuenta = cuenta.NumeroCuenta,
+                SaldoAnterior = saldoAnterior + montoInteres, // Era menos negativo
+                MontoInteres = montoInteres,
+                SaldoNuevo = cuenta.Saldo,
+                TasaAplicada = cuenta.InteresSobregiro
+            };
+        }
+
+        // DTOs adicionales para sobregiro
+        public class AcreditacionInteresSobregiroResult
+        {
+            public int CuentasProcesadas { get; set; }
+            public int CuentasOmitidas { get; set; }
+            public decimal MontoTotalCobrado { get; set; }
+            public List<string> Errores { get; set; } = new();
+            public List<DetalleCobro> DetallesPorCuenta { get; set; } = new();
+        }
+
+        public class DetalleCobro
+        {
+            public string NumeroCuenta { get; set; } = string.Empty;
+            public decimal SaldoAnterior { get; set; }
+            public decimal MontoInteres { get; set; }
+            public decimal SaldoNuevo { get; set; }
+            public decimal TasaAplicada { get; set; }
+        }
     }
 }

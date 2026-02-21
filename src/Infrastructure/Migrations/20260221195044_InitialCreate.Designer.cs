@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fast_Bank.Infrastructure.Migrations
 {
     [DbContext(typeof(DdContext))]
-    [Migration("20260212005300_UpdateModel")]
-    partial class UpdateModel
+    [Migration("20260221195044_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,28 +105,6 @@ namespace Fast_Bank.Infrastructure.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Domain.Entities.EntidadFinanciera", b =>
-                {
-                    b.Property<string>("IdEntidad")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Ciudad")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Direccion")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("IdEntidad");
-
-                    b.ToTable("EntidadesFinancieras");
-                });
-
             modelBuilder.Entity("Domain.Entities.Movimiento", b =>
                 {
                     b.Property<string>("IdMovimiento")
@@ -166,18 +144,35 @@ namespace Fast_Bank.Infrastructure.Migrations
                     b.Property<string>("NumeroTarjeta")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ClienteCedula")
+                    b.Property<double>("CreditoDisponible")
+                        .HasColumnType("REAL");
+
+                    b.Property<DateTime>("FechaEmision")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("LimiteCredito")
+                    b.Property<DateTime>("FechaVencimiento")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("SaldoPendiente")
+                    b.Property<string>("IdCliente")
+                        .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<double>("LimiteCredito")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("PagoMinimo")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("SaldoUtilizado")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("TasaInteresMensual")
+                        .HasColumnType("REAL");
 
                     b.HasKey("NumeroTarjeta");
 
-                    b.HasIndex("ClienteCedula");
+                    b.HasIndex("IdCliente")
+                        .IsUnique();
 
                     b.ToTable("TarjetasCredito");
                 });
@@ -232,8 +227,10 @@ namespace Fast_Bank.Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.TarjetaCredito", b =>
                 {
                     b.HasOne("Domain.Entities.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteCedula");
+                        .WithOne("TarjetaCredito")
+                        .HasForeignKey("Domain.Entities.TarjetaCredito", "IdCliente")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Cliente");
                 });
@@ -241,6 +238,8 @@ namespace Fast_Bank.Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Cliente", b =>
                 {
                     b.Navigation("Cuenta");
+
+                    b.Navigation("TarjetaCredito");
                 });
 #pragma warning restore 612, 618
         }

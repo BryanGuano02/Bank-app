@@ -13,7 +13,7 @@ namespace Domain.Services
 
             // F�rmula: Inter�s = Saldo * (TasaInteres / 12)
             // TasaInteres es anual, dividimos entre 12 para obtener la mensual
-            var interesMensual = cuenta.Saldo * (decimal)(cuenta.TasaInteres / (12*100));
+            var interesMensual = cuenta.Saldo * (decimal)(cuenta.TasaInteres / (12 * 100));
 
             return Math.Round(interesMensual, 2); // Redondear a 2 decimales
         }
@@ -36,6 +36,46 @@ namespace Domain.Services
             );
 
             // Ejecutar la estrategia (deposita el inter�s)
+            movimiento.Ejecutar();
+
+            return movimiento;
+        }
+
+        public decimal CalcularInteresSobregiro(CuentaCorriente cuenta)
+        {
+            if (cuenta == null) throw new ArgumentNullException(nameof(cuenta));
+
+            // Solo calcular inter�s si el saldo es negativo (est� en sobregiro)
+            if (cuenta.Saldo >= 0)
+                return 0;
+
+            // Calcular inter�s sobre el monto en sobregiro (valor absoluto del saldo negativo)
+            // F�rmula: Inter�s = |Saldo| * InteresSobregiro
+            var montoSobregiro = Math.Abs(cuenta.Saldo);
+            var interesSobregiro = montoSobregiro * cuenta.InteresSobregiro;
+
+            return Math.Round(interesSobregiro, 2); // Redondear a 2 decimales
+        }
+
+        public Movimiento CrearYEjecutarCargoInteresSobregiro(string idMovimiento, CuentaCorriente cuenta, decimal montoInteres)
+        {
+            if (cuenta == null) throw new ArgumentNullException(nameof(cuenta));
+            if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inv�lido.", nameof(idMovimiento));
+            if (montoInteres <= 0) throw new ArgumentOutOfRangeException(nameof(montoInteres), "El monto de inter�s debe ser mayor que cero.");
+
+            var descripcion = $"Inter�s por sobregiro - Tasa: {cuenta.InteresSobregiro:P2}";
+
+            // Crear movimiento de cargo para intereses de sobregiro
+            var movimiento = Movimiento.Create(
+                idMovimiento,
+                montoInteres,
+                null,   // Sin cuenta origen (es un cargo autom�tico)
+                cuenta, // La cuenta corriente es el destino (se le cobra)
+                descripcion,
+                new InteresTipo() // Usar la misma estrategia InteresTipo para todos los intereses
+            );
+
+            // Ejecutar la estrategia (retira/cobra el inter�s)
             movimiento.Ejecutar();
 
             return movimiento;

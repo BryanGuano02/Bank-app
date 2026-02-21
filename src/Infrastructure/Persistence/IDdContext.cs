@@ -13,7 +13,7 @@ namespace Fast_Bank.Infrastructure.Persistence
         DbSet<CuentaAhorros> CuentasAhorros { get; }
         DbSet<CuentaCorriente> CuentasCorrientes { get; }
         DbSet<TarjetaCredito> TarjetasCredito { get; }
-        DbSet<EntidadFinanciera> EntidadesFinancieras { get; }
+        // DbSet<EntidadFinanciera> EntidadesFinancieras { get; } // Comentado: clase no existe en el proyecto
         DbSet<ControlEjecucion> ControlEjecuciones { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

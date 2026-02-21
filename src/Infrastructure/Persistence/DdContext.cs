@@ -17,7 +17,7 @@ namespace Fast_Bank.Infrastructure.Persistence
         public DbSet<CuentaAhorros> CuentasAhorros { get; set; }
         public DbSet<CuentaCorriente> CuentasCorrientes { get; set; }
         public DbSet<TarjetaCredito> TarjetasCredito { get; set; }
-        public DbSet<EntidadFinanciera> EntidadesFinancieras { get; set; }
+        // public DbSet<EntidadFinanciera> EntidadesFinancieras { get; set; } // Comentado: clase no existe en el proyecto
         public DbSet<ControlEjecucion> ControlEjecuciones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

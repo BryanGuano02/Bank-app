@@ -28,33 +28,41 @@ namespace Fast_Bank.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ControlEjecuciones",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Proceso = table.Column<string>(type: "TEXT", nullable: false),
+                    UltimaEjecucion = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "BLOB", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ControlEjecuciones", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Cuentas",
                 columns: table => new
                 {
                     NumeroCuenta = table.Column<string>(type: "TEXT", nullable: false),
                     Saldo = table.Column<decimal>(type: "TEXT", nullable: false),
                     FechaApertura = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ClienteCedula = table.Column<string>(type: "TEXT", nullable: true),
                     TipoCuenta = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
                     TasaInteres = table.Column<double>(type: "REAL", nullable: true),
-                    LimiteSobregiro = table.Column<decimal>(type: "TEXT", nullable: true)
+                    LimiteSobregiro = table.Column<decimal>(type: "TEXT", nullable: true),
+                    InteresSobregiro = table.Column<decimal>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cuentas", x => x.NumeroCuenta);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EntidadesFinancieras",
-                columns: table => new
-                {
-                    IdEntidad = table.Column<string>(type: "TEXT", nullable: false),
-                    Nombre = table.Column<string>(type: "TEXT", nullable: false),
-                    Ciudad = table.Column<string>(type: "TEXT", nullable: false),
-                    Direccion = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EntidadesFinancieras", x => x.IdEntidad);
+                    table.ForeignKey(
+                        name: "FK_Cuentas_Clientes_ClienteCedula",
+                        column: x => x.ClienteCedula,
+                        principalTable: "Clientes",
+                        principalColumn: "Cedula");
                 });
 
             migrationBuilder.CreateTable(
@@ -62,18 +70,24 @@ namespace Fast_Bank.Infrastructure.Migrations
                 columns: table => new
                 {
                     NumeroTarjeta = table.Column<string>(type: "TEXT", nullable: false),
-                    LimiteCredito = table.Column<decimal>(type: "TEXT", nullable: false),
-                    SaldoPendiente = table.Column<decimal>(type: "TEXT", nullable: false),
-                    ClienteCedula = table.Column<string>(type: "TEXT", nullable: true)
+                    LimiteCredito = table.Column<double>(type: "REAL", nullable: false),
+                    SaldoUtilizado = table.Column<double>(type: "REAL", nullable: false),
+                    FechaEmision = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    FechaVencimiento = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TasaInteresMensual = table.Column<double>(type: "REAL", nullable: false),
+                    CreditoDisponible = table.Column<double>(type: "REAL", nullable: false),
+                    PagoMinimo = table.Column<double>(type: "REAL", nullable: false),
+                    IdCliente = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TarjetasCredito", x => x.NumeroTarjeta);
                     table.ForeignKey(
-                        name: "FK_TarjetasCredito_Clientes_ClienteCedula",
-                        column: x => x.ClienteCedula,
+                        name: "FK_TarjetasCredito_Clientes_IdCliente",
+                        column: x => x.IdCliente,
                         principalTable: "Clientes",
-                        principalColumn: "Cedula");
+                        principalColumn: "Cedula",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,6 +118,12 @@ namespace Fast_Bank.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Cuentas_ClienteCedula",
+                table: "Cuentas",
+                column: "ClienteCedula",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Movimientos_DestinoNumeroCuenta",
                 table: "Movimientos",
                 column: "DestinoNumeroCuenta");
@@ -114,16 +134,17 @@ namespace Fast_Bank.Infrastructure.Migrations
                 column: "OrigenNumeroCuenta");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TarjetasCredito_ClienteCedula",
+                name: "IX_TarjetasCredito_IdCliente",
                 table: "TarjetasCredito",
-                column: "ClienteCedula");
+                column: "IdCliente",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EntidadesFinancieras");
+                name: "ControlEjecuciones");
 
             migrationBuilder.DropTable(
                 name: "Movimientos");

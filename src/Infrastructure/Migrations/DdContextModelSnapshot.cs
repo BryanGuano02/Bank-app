@@ -102,28 +102,6 @@ namespace Fast_Bank.Infrastructure.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Domain.Entities.EntidadFinanciera", b =>
-                {
-                    b.Property<string>("IdEntidad")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Ciudad")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Direccion")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("IdEntidad");
-
-                    b.ToTable("EntidadesFinancieras");
-                });
-
             modelBuilder.Entity("Domain.Entities.Movimiento", b =>
                 {
                     b.Property<string>("IdMovimiento")
