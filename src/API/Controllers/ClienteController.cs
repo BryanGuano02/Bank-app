@@ -47,31 +47,6 @@ public class ClienteController : ControllerBase
         public double TasaInteresMensual { get; set; } = 2.5;
     }
 
-    // DTOs antiguos para compatibilidad (Obsoletos)
-    [Obsolete("Usar CrearClienteConCuentaRequest con enum TipoCuenta")]
-    public class CrearClienteConCuentaCorrienteRequest
-    {
-        public string Cedula { get; set; } = string.Empty;
-        public string Nombre { get; set; } = string.Empty;
-        public string Apellido { get; set; } = string.Empty;
-        public string Direccion { get; set; } = string.Empty;
-        public string Correo { get; set; } = string.Empty;
-        public string Telefono { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
-    }
-
-    [Obsolete("Usar CrearClienteConCuentaRequest con enum TipoCuenta")]
-    public class CrearClienteConCuentaAhorrosRequest
-    {
-        public string Cedula { get; set; } = string.Empty;
-        public string Nombre { get; set; } = string.Empty;
-        public string Apellido { get; set; } = string.Empty;
-        public string Direccion { get; set; } = string.Empty;
-        public string Correo { get; set; } = string.Empty;
-        public string Telefono { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
-    }
-
     public class ActualizarClienteRequest
     {
         public string Nombre { get; set; } = string.Empty;
@@ -151,101 +126,6 @@ public class ClienteController : ControllerBase
             {
                 Mensaje = $"Cliente, cuenta {req.TipoCuenta} y tarjeta de crédito creados exitosamente",
                 Cliente = MapToDtoConTarjeta(clienteCompleto!)
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { error = ex.Message });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
-    // ===== ENDPOINTS ANTIGUOS (Deprecated pero funcionales) =====
-
-    [HttpPost("con-cuenta-corriente")]
-    [Obsolete("Usar POST /api/cliente/con-cuenta con TipoCuenta=Corriente")]
-    public async Task<IActionResult> CrearConCuentaCorriente([FromBody] CrearClienteConCuentaCorrienteRequest req)
-    {
-        if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.Cedula)) return BadRequest("Cédula es requerida.");
-
-        try
-        {
-            var cliente = await _clienteService.CrearClienteConCuentaCorrienteAsync(
-                req.Cedula,
-                req.Nombre,
-                req.Apellido,
-                req.Direccion,
-                req.Correo,
-                req.Telefono,
-                req.SaldoInicial
-            );
-
-            var cuentaCorriente = cliente.Cuenta as CuentaCorriente;
-            var location = $"/api/cliente/{cliente.Cedula}";
-            return Created(location, new
-            {
-                Cedula = cliente.Cedula,
-                Nombre = cliente.Nombre,
-                Apellido = cliente.Apellido,
-                Cuenta = new
-                {
-                    NumeroCuenta = cliente.Cuenta?.NumeroCuenta,
-                    TipoCuenta = "Corriente",
-                    Saldo = cliente.Cuenta?.Saldo,
-                    LimiteSobregiro = cuentaCorriente?.LimiteSobregiro,
-                    InteresSobregiro = cuentaCorriente?.InteresSobregiro,
-                    FechaApertura = cliente.Cuenta?.FechaApertura
-                }
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { error = ex.Message });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
-    }
-
-    [HttpPost("con-cuenta-ahorros")]
-    [Obsolete("Usar POST /api/cliente/con-cuenta con TipoCuenta=Ahorros")]
-    public async Task<IActionResult> CrearConCuentaAhorros([FromBody] CrearClienteConCuentaAhorrosRequest req)
-    {
-        if (req == null) return BadRequest();
-        if (string.IsNullOrWhiteSpace(req.Cedula)) return BadRequest("Cédula es requerida.");
-
-        try
-        {
-            var cliente = await _clienteService.CrearClienteConCuentaAhorrosAsync(
-                req.Cedula,
-                req.Nombre,
-                req.Apellido,
-                req.Direccion,
-                req.Correo,
-                req.Telefono,
-                req.SaldoInicial
-            );
-
-            var cuentaAhorros = cliente.Cuenta as CuentaAhorros;
-            var location = $"/api/cliente/{cliente.Cedula}";
-            return Created(location, new
-            {
-                Cedula = cliente.Cedula,
-                Nombre = cliente.Nombre,
-                Apellido = cliente.Apellido,
-                Cuenta = new
-                {
-                    NumeroCuenta = cliente.Cuenta?.NumeroCuenta,
-                    TipoCuenta = "Ahorros",
-                    Saldo = cliente.Cuenta?.Saldo,
-                    TasaInteres = cuentaAhorros?.TasaInteres,
-                    FechaApertura = cliente.Cuenta?.FechaApertura
-                }
             });
         }
         catch (InvalidOperationException ex)
