@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Domain.Entities;
 using Fast_Bank.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using DomainInteresesService = Domain.Services.InteresesService;
 
 namespace Fast_Bank.Application.Services
 {
     public class InteresesUseCase
     {
         private readonly IDdContext _context;
-        private readonly Domain.Services.InteresesService _domainInteresesService = new();
+        private readonly DomainInteresesService _domainInteresesService = new();
 
         public InteresesUseCase(IDdContext context)
         {
@@ -107,57 +108,34 @@ namespace Fast_Bank.Application.Services
             };
         }
 
-        public async Task<SimulacionInteresResult> SimularInteresAsync(string numeroCuenta)
+
+        // DTOs de respuesta
+        public class AcreditacionInteresesResult
         {
-            if (string.IsNullOrWhiteSpace(numeroCuenta))
-                throw new ArgumentException("N�mero de cuenta inv�lido.", nameof(numeroCuenta));
-
-            var cuenta = await _context.CuentasAhorros
-                .FirstOrDefaultAsync(c => c.NumeroCuenta == numeroCuenta);
-
-            if (cuenta == null)
-                throw new InvalidOperationException($"No se encontr� cuenta de ahorros con n�mero: {numeroCuenta}");
-
-            var interesMensual = _domainInteresesService.CalcularInteresMensual(cuenta);
-
-            return new SimulacionInteresResult
-            {
-                NumeroCuenta = cuenta.NumeroCuenta,
-                SaldoActual = cuenta.Saldo,
-                TasaInteresAnual = cuenta.TasaInteres,
-                TasaInteresMensual = cuenta.TasaInteres / 12,
-                InteresCalculado = interesMensual,
-                SaldoProyectado = cuenta.Saldo + interesMensual
-            };
+            public int CuentasProcesadas { get; set; }
+            public int CuentasOmitidas { get; set; }
+            public decimal MontoTotalAcreditado { get; set; }
+            public List<string> Errores { get; set; } = new();
+            public List<DetalleAcreditacion> DetallesPorCuenta { get; set; } = new();
         }
-    }
 
-    // DTOs de respuesta
-    public class AcreditacionInteresesResult
-    {
-        public int CuentasProcesadas { get; set; }
-        public int CuentasOmitidas { get; set; }
-        public decimal MontoTotalAcreditado { get; set; }
-        public List<string> Errores { get; set; } = new();
-        public List<DetalleAcreditacion> DetallesPorCuenta { get; set; } = new();
-    }
+        public class DetalleAcreditacion
+        {
+            public string NumeroCuenta { get; set; } = string.Empty;
+            public decimal SaldoAnterior { get; set; }
+            public decimal MontoInteres { get; set; }
+            public decimal SaldoNuevo { get; set; }
+            public double TasaAplicada { get; set; }
+        }
 
-    public class DetalleAcreditacion
-    {
-        public string NumeroCuenta { get; set; } = string.Empty;
-        public decimal SaldoAnterior { get; set; }
-        public decimal MontoInteres { get; set; }
-        public decimal SaldoNuevo { get; set; }
-        public double TasaAplicada { get; set; }
-    }
-
-    public class SimulacionInteresResult
-    {
-        public string NumeroCuenta { get; set; } = string.Empty;
-        public decimal SaldoActual { get; set; }
-        public double TasaInteresAnual { get; set; }
-        public double TasaInteresMensual { get; set; }
-        public decimal InteresCalculado { get; set; }
-        public decimal SaldoProyectado { get; set; }
+        public class SimulacionInteresResult
+        {
+            public string NumeroCuenta { get; set; } = string.Empty;
+            public decimal SaldoActual { get; set; }
+            public double TasaInteresAnual { get; set; }
+            public double TasaInteresMensual { get; set; }
+            public decimal InteresCalculado { get; set; }
+            public decimal SaldoProyectado { get; set; }
+        }
     }
 }

@@ -37,6 +37,13 @@ namespace Fast_Bank.Infrastructure.Persistence
                 .WithOne(cu => cu.Cliente)
                 .HasForeignKey<Cuenta>(cu => cu.ClienteCedula);
 
+            // Configurar relación uno-a-uno entre Cliente y TarjetaCredito
+            modelBuilder.Entity<Cliente>()
+                .HasOne(c => c.TarjetaCredito)
+                .WithOne(t => t.Cliente)
+                .HasForeignKey<TarjetaCredito>(t => t.IdCliente)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Registrar las entidades concretas para asegurarnos que EF Core las descubre
             modelBuilder.Entity<CuentaAhorros>();
             modelBuilder.Entity<CuentaCorriente>();

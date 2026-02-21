@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Domain.Entities;
 
 namespace Fast_Bank.API.BackgroundServices
 {
@@ -100,7 +101,7 @@ namespace Fast_Bank.API.BackgroundServices
                     // Intentar actualizar el registro de control PRIMERO para adquirir el "lock" optimista
                     if (control == null)
                     {
-                        control = new Domain.Entities.ControlEjecucion
+                        control = new ControlEjecucion
                         {
                             Proceso = "AcreditacionInteresesMensuales",
                             UltimaEjecucion = ahora

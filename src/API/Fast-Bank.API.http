@@ -4,3 +4,28 @@ GET {{Fast_Bank.API_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Tarjetas de Crédito - Credit Card Operations
+
+### Obtener información de tarjeta de crédito
+GET {{Fast_Bank.API_HostAddress}}/api/tarjetascredito/TC001
+Accept: application/json
+
+### Realizar compra con tarjeta de crédito
+POST {{Fast_Bank.API_HostAddress}}/api/tarjetascredito/TC001/comprar
+Content-Type: application/json
+
+{
+  "monto": 150.00,
+  "descripcion": "Compra en supermercado"
+}
+
+### Realizar pago a tarjeta de crédito
+POST {{Fast_Bank.API_HostAddress}}/api/tarjetascredito/TC001/pagar
+Content-Type: application/json
+
+{
+  "monto": 50.00
+}
+
+###

@@ -64,32 +64,5 @@ namespace Fast_Bank.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-        [HttpGet("simular/{numeroCuenta}")]
-        public async Task<IActionResult> SimularInteres(string numeroCuenta)
-        {
-            try
-            {
-                var simulacion = await _interesesService.SimularInteresAsync(numeroCuenta);
-
-                return Ok(new
-                {
-                    NumeroCuenta = simulacion.NumeroCuenta,
-                    SaldoActual = simulacion.SaldoActual,
-                    TasaInteresAnual = simulacion.TasaInteresAnual,
-                    TasaInteresMensual = simulacion.TasaInteresMensual,
-                    InteresCalculado = simulacion.InteresCalculado,
-                    SaldoProyectado = simulacion.SaldoProyectado
-                });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return NotFound(new { error = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
     }
 }

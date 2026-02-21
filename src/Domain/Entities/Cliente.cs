@@ -16,6 +16,7 @@ namespace Domain.Entities
         public string Telefono { get; private set; }
 
         public Cuenta? Cuenta { get; private set; }
+        public TarjetaCredito? TarjetaCredito { get; private set; }
 
         protected Cliente()
         {
@@ -69,6 +70,11 @@ namespace Domain.Entities
         internal void SetCuenta(Cuenta cuenta)
         {
             Cuenta = cuenta ?? throw new ArgumentNullException(nameof(cuenta));
+        }
+
+        internal void SetTarjetaCredito(TarjetaCredito tarjeta)
+        {
+            TarjetaCredito = tarjeta ?? throw new ArgumentNullException(nameof(tarjeta));
         }
     }
 }
