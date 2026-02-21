@@ -3,6 +3,7 @@ using Domain.Enums;
 using Fast_Bank.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using DomainClienteService = Domain.Services.ClienteService;
+using DomainTarjetaCreditoService = Domain.Services.TarjetaCreditoService;
 
 namespace Fast_Bank.Application.Services;
 
@@ -10,17 +11,23 @@ public class ClienteUseCase
 {
     private readonly IDdContext _context;
     private readonly DomainClienteService _domainClienteService;
+    private readonly DomainTarjetaCreditoService _domainTarjetaCreditoService;
 
-    public ClienteUseCase(IDdContext context, DomainClienteService domainClienteService)
+    public ClienteUseCase(
+        IDdContext context,
+        DomainClienteService domainClienteService,
+        DomainTarjetaCreditoService domainTarjetaCreditoService)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _domainClienteService = domainClienteService ?? throw new ArgumentNullException(nameof(domainClienteService));
+        _domainTarjetaCreditoService = domainTarjetaCreditoService ?? throw new ArgumentNullException(nameof(domainTarjetaCreditoService));
     }
 
     public async Task<List<Cliente>> GetAllClientesAsync()
     {
         return await _context.Clientes
             .Include(c => c.Cuenta)
+            .Include(c => c.TarjetaCredito)
             .ToListAsync();
     }
 
@@ -30,6 +37,7 @@ public class ClienteUseCase
 
         return await _context.Clientes
             .Include(c => c.Cuenta)
+            .Include(c => c.TarjetaCredito)
             .FirstOrDefaultAsync(c => c.Cedula == cedula);
     }
 
@@ -124,19 +132,12 @@ public class ClienteUseCase
     // Nuevo método para crear cliente con cuenta y tarjeta de crédito
     public async Task<Cliente> CrearClienteConCuentaYTarjetaAsync(
         string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        decimal saldoInicial, TipoCuenta tipoCuenta,
-        string numeroTarjeta, double limiteCredito, double tasaInteresMensual)
+        decimal saldoInicial, TipoCuenta tipoCuenta)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
-        if (string.IsNullOrWhiteSpace(numeroTarjeta)) throw new ArgumentException("Número de tarjeta inválido.", nameof(numeroTarjeta));
-        if (limiteCredito <= 0) throw new ArgumentException("Límite de crédito debe ser mayor a cero.", nameof(limiteCredito));
 
         var existeCliente = await _context.Clientes.FindAsync(cedula);
         if (existeCliente != null) throw new InvalidOperationException("El cliente ya existe.");
-
-        // Verificar si el número de tarjeta ya existe
-        var existeTarjeta = await _context.TarjetasCredito.FindAsync(numeroTarjeta);
-        if (existeTarjeta != null) throw new InvalidOperationException("El número de tarjeta ya existe.");
 
         // Crear cliente con cuenta
         Cliente cliente;
@@ -158,15 +159,9 @@ public class ClienteUseCase
                 throw new ArgumentException("Tipo de cuenta no válido.", nameof(tipoCuenta));
         }
 
-        // Crear tarjeta de crédito
-        var tarjeta = TarjetaCredito.Create(
-            numeroTarjeta,
-            limiteCredito,
-            DateTime.Now,
-            DateTime.Now.AddYears(3),
-            tasaInteresMensual);
+        // Crear tarjeta de crédito con número generado automáticamente y valores por defecto
+        var tarjeta = _domainTarjetaCreditoService.CrearTarjetaCredito(cedula);
 
-        tarjeta.IdCliente = cedula;
         _domainClienteService.AsignarTarjetaCredito(cliente, tarjeta);
 
         await _context.Clientes.AddAsync(cliente);

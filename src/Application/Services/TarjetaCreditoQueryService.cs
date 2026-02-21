@@ -22,7 +22,6 @@ public class TarjetaCreditoQueryService
             throw new ArgumentException("Número de tarjeta inválido.", nameof(numeroTarjeta));
 
         var tarjeta = await _context.TarjetasCredito
-            .Include(t => t.Cliente)
             .FirstOrDefaultAsync(t => t.NumeroTarjeta == numeroTarjeta);
 
         if (tarjeta == null)
@@ -43,8 +42,7 @@ public class TarjetaCreditoQueryService
             FechaVencimiento = tarjeta.FechaVencimiento,
             TasaInteresMensual = tarjeta.TasaInteresMensual,
             PagoMinimo = tarjeta.PagoMinimo,
-            EstaVencida = tarjeta.EstaVencida(),
-            NombreCliente = tarjeta.Cliente != null ? $"{tarjeta.Cliente.Nombre} {tarjeta.Cliente.Apellido}" : null
+            EstaVencida = tarjeta.EstaVencida()
         };
     }
 }
@@ -61,7 +59,4 @@ public class TarjetaCreditoDto
     public double TasaInteresMensual { get; set; }
     public double PagoMinimo { get; set; }
     public bool EstaVencida { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? NombreCliente { get; set; }
 }

@@ -42,9 +42,6 @@ public class ClienteController : ControllerBase
         public string Telefono { get; set; } = string.Empty;
         public decimal SaldoInicial { get; set; }
         public TipoCuenta TipoCuenta { get; set; }
-        public string NumeroTarjeta { get; set; } = string.Empty;
-        public double LimiteCredito { get; set; }
-        public double TasaInteresMensual { get; set; } = 2.5;
     }
 
     public class ActualizarClienteRequest
@@ -99,7 +96,6 @@ public class ClienteController : ControllerBase
     {
         if (req == null) return BadRequest();
         if (string.IsNullOrWhiteSpace(req.Cedula)) return BadRequest("Cédula es requerida.");
-        if (string.IsNullOrWhiteSpace(req.NumeroTarjeta)) return BadRequest("Número de tarjeta es requerido.");
 
         try
         {
@@ -111,10 +107,7 @@ public class ClienteController : ControllerBase
                 req.Correo,
                 req.Telefono,
                 req.SaldoInicial,
-                req.TipoCuenta,
-                req.NumeroTarjeta,
-                req.LimiteCredito,
-                req.TasaInteresMensual
+                req.TipoCuenta
             );
 
             var location = $"/api/cliente/{cliente.Cedula}";
