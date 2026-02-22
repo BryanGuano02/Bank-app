@@ -137,7 +137,7 @@ public class ClienteController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var clientes = await _clienteService.GetAllClientesAsync();
-        var dtos = clientes.Select(MapToDto);
+        var dtos = clientes.Select(MapToDtoConTarjeta);
         return Ok(dtos);
     }
 
@@ -149,7 +149,7 @@ public class ClienteController : ControllerBase
         var cliente = await _clienteService.GetClienteAsync(cedula);
         if (cliente == null) return NotFound(new { error = "Cliente no encontrado." });
 
-        return Ok(MapToDto(cliente));
+        return Ok(MapToDtoConTarjeta(cliente));
     }
 
     [HttpPut("{cedula}")]

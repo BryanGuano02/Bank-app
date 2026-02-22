@@ -12,7 +12,7 @@ namespace Domain.Logic
         {
             validar(movimiento);
             movimiento.Origen!.Retirar(movimiento.Monto);
-            movimiento.Destino.Depositar(movimiento.Monto);
+            movimiento.Destino!.Depositar(movimiento.Monto);
         }
 
         public void validar(Movimiento movimiento)

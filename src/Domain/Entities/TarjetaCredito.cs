@@ -15,7 +15,6 @@ namespace Domain.Entities
         public double CreditoDisponible { get; private set; }
         public double PagoMinimo { get; private set; }
 
-        // Relación 1:1 con Cliente
         public string IdCliente { get; set; } = string.Empty;
         public Cliente? Cliente { get; set; }
 
