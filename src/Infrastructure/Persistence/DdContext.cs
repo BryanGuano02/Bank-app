@@ -34,9 +34,20 @@ namespace Fast_Bank.Infrastructure.Persistence
                 // EF Core usará el backing field _movimientos para cargar/rastrear la colección.
                 b.HasMany(c => c.Movimientos)
                     .WithOne(m => m.Destino)
-                    .IsRequired();
+                    .IsRequired(false);  // Nullable: retiros no tienen cuenta destino
                 b.Navigation(c => c.Movimientos)
                     .UsePropertyAccessMode(PropertyAccessMode.Field);
+            });
+
+            // Configurar relación uno-a-uno entre Cliente y Cuenta especificando la FK
+            modelBuilder.Entity<Movimiento>(b =>
+            {
+                // Origen es nullable: depósitos no tienen cuenta origen
+                b.HasOne(m => m.Origen)
+                    .WithMany()
+                    .HasForeignKey("OrigenNumeroCuenta")
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // Configurar relación uno-a-uno entre Cliente y Cuenta especificando la FK

@@ -21,16 +21,16 @@ namespace Domain.Entities
 
         // Relaciones de EF Core
         public Cuenta? Origen { get; private set; }
-        public Cuenta Destino { get; private set; }
+        public Cuenta? Destino { get; private set; }
 
         // --- CONSTRUCTORES ---
 
-        public static Movimiento Create(string idMovimiento, double monto, Cuenta? origen, Cuenta destino, string descripcion, ITipoMovimiento estrategia)
+        public static Movimiento Create(string idMovimiento, double monto, Cuenta? origen, Cuenta? destino, string descripcion, ITipoMovimiento estrategia)
         {
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.");
             if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser > 0.");
             if (estrategia == null) throw new ArgumentNullException(nameof(estrategia));
-            if (destino == null) throw new ArgumentNullException(nameof(destino));
+            if (destino == null && origen == null) throw new ArgumentException("Debe especificarse al menos una cuenta de origen o destino.");
 
             return new Movimiento
             {
@@ -53,7 +53,6 @@ namespace Domain.Entities
             Descripcion = descripcion;
             Fecha = fecha;
             Tipo = tipo;
-            Destino = null!;
             Estrategia = ResolverEstrategia(tipo);
         }
 
@@ -64,7 +63,6 @@ namespace Domain.Entities
             Descripcion = string.Empty;
             Tipo = string.Empty;
             Estrategia = null!;
-            Destino = null!;
         }
 
         // --- MÉTODOS AUXILIARES ---
