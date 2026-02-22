@@ -39,11 +39,6 @@ namespace Domain.Entities
             base.Retirar(monto);
         }
 
-        /// <summary>
-        /// Aplica un cargo de interés por sobregiro pre-calculado por el Domain Service.
-        /// Modifica el propio estado, crea el Movimiento y lo añade al Agregado.
-        /// </summary>
-        /// <returns>Detalle del cobro, o null si el monto no aplica.</returns>
         public DetalleCobro? AplicarInteresSobregiro(double montoInteres)
         {
             if (montoInteres <= 0)
@@ -77,9 +72,6 @@ namespace Domain.Entities
             };
         }
 
-        /// <summary>
-        /// Sobrescritura del método base (sin parámetros) para compatibilidad interna.
-        /// </summary>
         public override void AplicarInteresMensual()
         {
             // Interés de sobregiro: InteresSobregiro está en formato double (ej. 0.22 => 22%)

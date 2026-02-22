@@ -17,9 +17,6 @@ public class MovimientosController : ControllerBase
 
     // Las operaciones de creación de movimientos se movieron a `CuentasController`.
 
-    /// <summary>
-    /// Consultar un movimiento por ID
-    /// </summary>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
     {
@@ -31,9 +28,6 @@ public class MovimientosController : ControllerBase
         return Ok(movimiento);
     }
 
-    /// <summary>
-    /// Listar todos los movimientos
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -41,9 +35,6 @@ public class MovimientosController : ControllerBase
         return Ok(movimientos);
     }
 
-    /// <summary>
-    /// Obtener movimientos de una cuenta específica
-    /// </summary>
     [HttpGet("cuenta/{numeroCuenta}")]
     public async Task<IActionResult> GetByNumeroCuenta(string numeroCuenta)
     {

@@ -28,10 +28,6 @@ namespace Fast_Bank.Application.Services
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        /// <summary>
-        /// Acredita intereses mensuales a todas las cuentas de ahorros con saldo positivo.
-        /// La fórmula es: Saldo * (TasaAnual% / 12 / 100).
-        /// </summary>
         public async Task<AcreditacionInteresesResult> AcreditarInteresesMensualesAsync()
         {
             var resultado = new AcreditacionInteresesResult();
@@ -71,10 +67,6 @@ namespace Fast_Bank.Application.Services
             return resultado;
         }
 
-        /// <summary>
-        /// Cobra intereses de sobregiro a todas las cuentas corrientes con saldo negativo.
-        /// La fórmula es: |Saldo| * (TasaAnual / 12).
-        /// </summary>
         public async Task<AcreditacionInteresSobregiroResult> AcreditarInteresSobregiroATodas()
         {
             var resultado = new AcreditacionInteresSobregiroResult();

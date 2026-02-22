@@ -45,9 +45,6 @@ public class CuentasController : ControllerBase
         public string? Descripcion { get; set; }
     }
 
-    /// <summary>
-    /// Realizar un depósito (mueve desde MovimientosController)
-    /// </summary>
     [HttpPost("depositar")]
     public async Task<IActionResult> Depositar([FromBody] DepositoRequest req)
     {
@@ -65,9 +62,6 @@ public class CuentasController : ControllerBase
         return CreatedAtAction(nameof(MovimientosController.GetById), "Movimientos", new { id }, new { IdMovimiento = id });
     }
 
-    /// <summary>
-    /// Realizar un retiro (mueve desde MovimientosController)
-    /// </summary>
     [HttpPost("retirar")]
     public async Task<IActionResult> Retirar([FromBody] RetiroRequest req)
     {
@@ -91,7 +85,6 @@ public class CuentasController : ControllerBase
         }
     }
 
-    /// <summary>
     /// Realizar una transferencia (mueve desde MovimientosController)
     /// </summary>
     [HttpPost("transferir")]
@@ -172,9 +165,6 @@ public class CuentasController : ControllerBase
     }
 
 
-    /// <summary>
-    /// Consultar una cuenta por n�mero
-    /// </summary>
     [HttpGet("{numero}")]
     public async Task<IActionResult> Get(string numero)
     {
@@ -186,9 +176,6 @@ public class CuentasController : ControllerBase
         return Ok(cuenta);
     }
 
-    /// <summary>
-    /// Listar todas las cuentas
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

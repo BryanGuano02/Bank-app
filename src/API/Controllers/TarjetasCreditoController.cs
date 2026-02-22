@@ -57,10 +57,6 @@ public class TarjetasCreditoController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Obtener información de una tarjeta de crédito por su número
-    /// </summary>
-    /// <param name="numeroTarjeta">Número de la tarjeta de crédito</param>
     [HttpGet("{numeroTarjeta}")]
     public async Task<IActionResult> GetByNumero(string numeroTarjeta)
     {
@@ -82,11 +78,6 @@ public class TarjetasCreditoController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Realizar una compra con tarjeta de crédito
-    /// </summary>
-    /// <param name="numeroTarjeta">Número de la tarjeta de crédito</param>
-    /// <param name="req">Datos de la compra (monto y descripción)</param>
     [HttpPost("{numeroTarjeta}/comprar")]
     public async Task<IActionResult> RealizarCompra(string numeroTarjeta, [FromBody] CompraRequest req)
     {
@@ -121,11 +112,6 @@ public class TarjetasCreditoController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Realizar un pago a la tarjeta de crédito
-    /// </summary>
-    /// <param name="numeroTarjeta">Número de la tarjeta de crédito</param>
-    /// <param name="req">Datos del pago (monto)</param>
     [HttpPost("{numeroTarjeta}/pagar")]
     public async Task<IActionResult> RealizarPago(string numeroTarjeta, [FromBody] PagoRequest req)
     {

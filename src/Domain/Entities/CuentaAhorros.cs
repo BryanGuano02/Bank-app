@@ -36,11 +36,6 @@ namespace Domain.Entities
             base.Retirar(monto);
         }
 
-        /// <summary>
-        /// Aplica un monto de interés pre-calculado por el Domain Service.
-        /// Modifica el propio estado, crea el Movimiento y lo añade al Agregado.
-        /// </summary>
-        /// <returns>Detalle de la acreditación, o null si el monto no aplica.</returns>
         public DetalleAcreditacion? AplicarInteresMensual(double montoInteres)
         {
             if (montoInteres <= 0)
@@ -74,10 +69,6 @@ namespace Domain.Entities
             };
         }
 
-        /// <summary>
-        /// Sobrescritura del método base (sin parámetros) para compatibilidad interna.
-        /// Calcula y aplica el interés usando la tasa estática de la entidad.
-        /// </summary>
         public override void AplicarInteresMensual()
         {
             // Tratamos TASA_INTERES_AHORROS como porcentaje (ej. 3.0m => 3%)

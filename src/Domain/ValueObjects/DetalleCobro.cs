@@ -1,9 +1,5 @@
 namespace Domain.ValueObjects
 {
-    /// <summary>
-    /// Resultado inmutable que retorna CuentaCorriente.AplicarInteresSobregiro().
-    /// Vive en el Dominio porque es producido por la entidad.
-    /// </summary>
     public sealed class DetalleCobro
     {
         public string NumeroCuenta { get; init; } = string.Empty;
