@@ -1,5 +1,6 @@
 
 using Domain.Interfaces.States;
+using Fast_Bank.Domain.Utils;
 using System;
 
 namespace Domain.Entities
@@ -43,6 +44,7 @@ namespace Domain.Entities
             if (tasaMensual <= 0m) return;
 
             decimal montoInteres = Saldo * tasaMensual;
+            montoInteres = FinancialRounding.RoundMoney(montoInteres);
             if (montoInteres == 0m) return;
 
             AplicarMontoInteres(montoInteres);

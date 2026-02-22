@@ -1,6 +1,7 @@
 using System;
 using Domain.Entities;
 using Domain.Logic;
+using Fast_Bank.Domain.Utils;
 
 namespace Domain.Services
 {
@@ -15,7 +16,7 @@ namespace Domain.Services
             // TasaInteres es anual, dividimos entre 12 para obtener la mensual
             var interesMensual = cuenta.Saldo * (decimal)(cuenta.TasaInteres / (12 * 100));
 
-            return Math.Round(interesMensual, 2); // Redondear a 2 decimales
+            return FinancialRounding.RoundMoney(interesMensual);
         }
 
         public Movimiento CrearYEjecutarAcreditacionInteres(string idMovimiento, CuentaAhorros cuenta, decimal montoInteres)
@@ -54,7 +55,7 @@ namespace Domain.Services
             var montoSobregiro = Math.Abs(cuenta.Saldo);
             var interesSobregiro = montoSobregiro * cuenta.InteresSobregiro;
 
-            return Math.Round(interesSobregiro, 2); // Redondear a 2 decimales
+            return FinancialRounding.RoundMoney(interesSobregiro);
         }
 
         public Movimiento CrearYEjecutarCargoInteresSobregiro(string idMovimiento, CuentaCorriente cuenta, decimal montoInteres)

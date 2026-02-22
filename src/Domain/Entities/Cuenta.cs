@@ -1,5 +1,6 @@
 using Domain.Interfaces.States;
 using Domain.Patterns.State;
+using Fast_Bank.Domain.Utils;
 using System;
 
 namespace Domain.Entities
@@ -52,7 +53,7 @@ namespace Domain.Entities
 
         internal void ModificarSaldo(decimal monto)
         {
-            Saldo += monto;
+            Saldo = FinancialRounding.RoundMoney(Saldo + monto);
         }
 
         public void Depositar(decimal monto)

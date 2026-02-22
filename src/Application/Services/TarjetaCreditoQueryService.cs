@@ -35,13 +35,13 @@ public class TarjetaCreditoQueryService
         return new TarjetaCreditoDto
         {
             NumeroTarjeta = tarjeta.NumeroTarjeta,
-            LimiteCredito = tarjeta.LimiteCredito,
-            SaldoUtilizado = tarjeta.SaldoUtilizado,
-            CreditoDisponible = tarjeta.CreditoDisponible,
+            LimiteCredito = Math.Round(tarjeta.LimiteCredito, 2, MidpointRounding.ToEven),
+            SaldoUtilizado = Math.Round(tarjeta.SaldoUtilizado, 2, MidpointRounding.ToEven),
+            CreditoDisponible = Math.Round(tarjeta.CreditoDisponible, 2, MidpointRounding.ToEven),
             FechaEmision = tarjeta.FechaEmision,
             FechaVencimiento = tarjeta.FechaVencimiento,
-            TasaInteresMensual = tarjeta.TasaInteresMensual,
-            PagoMinimo = tarjeta.PagoMinimo,
+            TasaInteresMensual = Math.Round(tarjeta.TasaInteresMensual, 4, MidpointRounding.ToEven),
+            PagoMinimo = Math.Round(tarjeta.PagoMinimo, 2, MidpointRounding.ToEven),
             EstaVencida = tarjeta.EstaVencida()
         };
     }

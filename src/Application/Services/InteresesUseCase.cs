@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities;
+using Fast_Bank.Domain.Utils;
 using Fast_Bank.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using DomainInteresesService = Domain.Services.InteresesService;
@@ -34,6 +35,7 @@ namespace Fast_Bank.Application.Services
                 {
                     // Calcular interés esperado (usado para registro y validación)
                     var montoInteres = _domainInteresesService.CalcularInteresMensual(cuenta);
+                    montoInteres = FinancialRounding.RoundMoney(montoInteres);
 
                     // Si el interés es mayor a cero, aplicarlo en la entidad y registrar el movimiento
                     if (montoInteres > 0)
@@ -56,7 +58,7 @@ namespace Fast_Bank.Application.Services
                         await _context.Movimientos.AddAsync(movimiento);
 
                         resultado.CuentasProcesadas++;
-                        resultado.MontoTotalAcreditado += montoInteres;
+                        resultado.MontoTotalAcreditado = FinancialRounding.RoundMoney(resultado.MontoTotalAcreditado + montoInteres);
                         resultado.DetallesPorCuenta.Add(new DetalleAcreditacion
                         {
                             NumeroCuenta = cuenta.NumeroCuenta,
@@ -125,6 +127,7 @@ namespace Fast_Bank.Application.Services
                 try
                 {
                     var montoInteres = _domainInteresesService.CalcularInteresSobregiro(cuenta);
+                    montoInteres = FinancialRounding.RoundMoney(montoInteres);
 
                     if (montoInteres > 0)
                     {
@@ -146,7 +149,7 @@ namespace Fast_Bank.Application.Services
                         await _context.Movimientos.AddAsync(movimiento);
 
                         resultado.CuentasProcesadas++;
-                        resultado.MontoTotalCobrado += montoInteres;
+                        resultado.MontoTotalCobrado = FinancialRounding.RoundMoney(resultado.MontoTotalCobrado + montoInteres);
                         resultado.DetallesPorCuenta.Add(new DetalleCobro
                         {
                             NumeroCuenta = cuenta.NumeroCuenta,

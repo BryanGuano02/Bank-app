@@ -1,5 +1,6 @@
 
 using Domain.Interfaces.States;
+using Fast_Bank.Domain.Utils;
 using System;
 
 namespace Domain.Entities
@@ -47,6 +48,7 @@ namespace Domain.Entities
             {
                 decimal montoSobregiro = Math.Abs(Saldo);
                 decimal montoInteres = montoSobregiro * tasaMensual;
+                montoInteres = FinancialRounding.RoundMoney(montoInteres);
                 if (montoInteres == 0m) return;
 
                 // Cargar el interés (resta al saldo)

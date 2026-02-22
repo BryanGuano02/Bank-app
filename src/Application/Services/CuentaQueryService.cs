@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities;
+using Fast_Bank.Domain.Utils;
 using Fast_Bank.Application.DTOs.Cuenta;
 using Fast_Bank.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -42,10 +43,10 @@ namespace Fast_Bank.Application.Services
                 {
                     NumeroCuenta = cuenta.NumeroCuenta,
                     TipoCuenta = "Corriente",
-                    Saldo = cuenta.Saldo,
+                    Saldo = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo),
                     FechaApertura = cuenta.FechaApertura,
                     LimiteSobregiro = cuentaCorriente.LimiteSobregiro,
-                    SaldoDisponible = cuenta.Saldo + cuentaCorriente.LimiteSobregiro
+                    SaldoDisponible = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo + cuentaCorriente.LimiteSobregiro)
                 };
             }
             else if (cuenta is CuentaAhorros cuentaAhorros)
@@ -54,7 +55,7 @@ namespace Fast_Bank.Application.Services
                 {
                     NumeroCuenta = cuenta.NumeroCuenta,
                     TipoCuenta = "Ahorros",
-                    Saldo = cuenta.Saldo,
+                    Saldo = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo),
                     FechaApertura = cuenta.FechaApertura,
                     TasaInteres = cuentaAhorros.TasaInteres
                 };
@@ -65,7 +66,7 @@ namespace Fast_Bank.Application.Services
                 {
                     NumeroCuenta = cuenta.NumeroCuenta,
                     TipoCuenta = "Desconocido",
-                    Saldo = cuenta.Saldo,
+                    Saldo = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo),
                     FechaApertura = cuenta.FechaApertura
                 };
             }
