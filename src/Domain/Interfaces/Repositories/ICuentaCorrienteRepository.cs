@@ -6,6 +6,6 @@ namespace Domain.Interfaces.Repositories
 {
     public interface ICuentaCorrienteRepository
     {
-        Task<IEnumerable<CuentaCorriente>> GetCuentasEnSobregiroAsync(int page, int pageSize);
+        Task<IEnumerable<CuentaCorriente>> GetCuentasEnSobregiroAsync();
     }
 }

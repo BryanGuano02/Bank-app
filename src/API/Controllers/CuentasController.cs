@@ -10,11 +10,16 @@ public class CuentasController : ControllerBase
 {
     private readonly CuentaQueryService _cuentaQueryService;
     private readonly MovimientoUseCase _movimientoService;
+    private readonly CuentaUseCase _cuentaUseCase;
 
-    public CuentasController(CuentaQueryService cuentaQueryService, MovimientoUseCase movimientoService)
+    public CuentasController(
+        CuentaQueryService cuentaQueryService,
+        MovimientoUseCase movimientoService,
+        CuentaUseCase cuentaUseCase)
     {
         _cuentaQueryService = cuentaQueryService;
         _movimientoService = movimientoService;
+        _cuentaUseCase = cuentaUseCase;
     }
 
     // DTOs para operaciones de movimientos (delegadas a MovimientoService)
@@ -121,6 +126,51 @@ public class CuentasController : ControllerBase
     }
 
     // La creación de cuentas ahora se realiza vía `ClienteController`.
+
+    [HttpPost("ahorros/acreditar-intereses")]
+    public async Task<IActionResult> AcreditarInteresesAhorros()
+    {
+        try
+        {
+            var resultado = await _cuentaUseCase.AcreditarInteresesMensualesAsync();
+            return Ok(new
+            {
+                Mensaje = "Proceso de acreditación de intereses completado",
+                resultado.CuentasProcesadas,
+                resultado.CuentasOmitidas,
+                resultado.MontoTotalAcreditado,
+                Detalles = resultado.DetallesPorCuenta,
+                Errores = resultado.Errores.Count > 0 ? resultado.Errores : null
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error al procesar intereses", detalle = ex.Message });
+        }
+    }
+
+    [HttpPost("corrientes/cobrar-sobregiro")]
+    public async Task<IActionResult> CobrarInteresSobregiro()
+    {
+        try
+        {
+            var resultado = await _cuentaUseCase.AcreditarInteresSobregiroATodas();
+            return Ok(new
+            {
+                Mensaje = "Proceso de cobro de intereses de sobregiro completado",
+                resultado.CuentasProcesadas,
+                resultado.CuentasOmitidas,
+                resultado.MontoTotalCobrado,
+                Detalles = resultado.DetallesPorCuenta,
+                Errores = resultado.Errores.Count > 0 ? resultado.Errores : null
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error al procesar intereses de sobregiro", detalle = ex.Message });
+        }
+    }
+
 
     /// <summary>
     /// Consultar una cuenta por n�mero

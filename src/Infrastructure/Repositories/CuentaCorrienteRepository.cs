@@ -16,12 +16,10 @@ namespace Fast_Bank.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<CuentaCorriente>> GetCuentasEnSobregiroAsync(int page, int pageSize)
+        public async Task<IEnumerable<CuentaCorriente>> GetCuentasEnSobregiroAsync()
         {
             return await _context.CuentasCorrientes
                 .Where(c => c.Saldo < 0)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
                 .ToListAsync();
         }
     }

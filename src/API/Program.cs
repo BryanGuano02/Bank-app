@@ -36,7 +36,6 @@ builder.Services.AddScoped<MovimientoUseCase>();
 builder.Services.AddScoped<MovimientoQueryService>();
 builder.Services.AddScoped<CuentaUseCase>();
 builder.Services.AddScoped<CuentaQueryService>();
-builder.Services.AddScoped<InteresesUseCase>();
 builder.Services.AddScoped<ClienteUseCase>();
 builder.Services.AddScoped<TarjetaCreditoUseCase>();
 builder.Services.AddScoped<TarjetaCreditoQueryService>();
@@ -45,7 +44,6 @@ builder.Services.AddScoped<TarjetaCreditoQueryService>();
 builder.Services.AddScoped<Domain.Services.MovimientoService>();
 builder.Services.AddScoped<Domain.Services.ClienteService>();
 builder.Services.AddScoped<Domain.Services.CuentaService>();
-builder.Services.AddScoped<Domain.Services.InteresesService>();
 builder.Services.AddScoped<Domain.Services.TarjetaCreditoService>();
 
 

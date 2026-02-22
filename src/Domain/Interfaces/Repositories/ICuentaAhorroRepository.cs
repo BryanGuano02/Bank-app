@@ -6,6 +6,6 @@ namespace Domain.Interfaces.Repositories
 {
     public interface ICuentaAhorroRepository
     {
-        Task<IEnumerable<CuentaAhorros>> GetCuentasConSaldoPositivoAsync(int page, int pageSize);
+        Task<IEnumerable<CuentaAhorros>> GetCuentasConSaldoPositivoAsync();
     }
 }
