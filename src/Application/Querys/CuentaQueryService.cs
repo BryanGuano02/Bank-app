@@ -45,6 +45,7 @@ namespace Fast_Bank.Application.Services
                     TipoCuenta = "Corriente",
                     Saldo = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo),
                     FechaApertura = cuenta.FechaApertura,
+                    NombreEstado = cuenta.NombreEstado,
                     LimiteSobregiro = cuentaCorriente.LimiteSobregiro,
                     SaldoDisponible = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo + cuentaCorriente.LimiteSobregiro)
                 };
@@ -57,6 +58,7 @@ namespace Fast_Bank.Application.Services
                     TipoCuenta = "Ahorros",
                     Saldo = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo),
                     FechaApertura = cuenta.FechaApertura,
+                    NombreEstado = cuenta.NombreEstado,
                     TasaInteres = CuentaAhorros.TASA_INTERES_AHORROS
                 };
             }
@@ -67,7 +69,8 @@ namespace Fast_Bank.Application.Services
                     NumeroCuenta = cuenta.NumeroCuenta,
                     TipoCuenta = "Desconocido",
                     Saldo = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo),
-                    FechaApertura = cuenta.FechaApertura
+                    FechaApertura = cuenta.FechaApertura,
+                    NombreEstado = cuenta.NombreEstado,
                 };
             }
         }

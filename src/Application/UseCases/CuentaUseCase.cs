@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Interfaces.Repositories;
+using Domain.Patterns.State;
 using Fast_Bank.Application.DTOs.Interes;
 using Fast_Bank.Domain.Utils;
 using Fast_Bank.Infrastructure.Persistence;
@@ -104,6 +105,38 @@ namespace Fast_Bank.Application.Services
             await _unitOfWork.SaveChangesAsync();
             resultado.MontoTotalCobrado = FinancialRounding.RoundMoney(resultado.MontoTotalCobrado);
             return resultado;
+        }
+
+        public async Task<bool> BloquearCuentaAsync(string numeroCuenta)
+        {
+            if (string.IsNullOrWhiteSpace(numeroCuenta)) throw new ArgumentException("numeroCuenta es requerido", nameof(numeroCuenta));
+
+            var cuenta = await _context.Cuentas.FindAsync(numeroCuenta);
+            if (cuenta == null) return false;
+
+            if (string.Equals(cuenta.NombreEstado, "Bloqueada", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("La cuenta ya se encuentra bloqueada.");
+
+            cuenta.CambiarEstado(new EstadoCuentaBloqueada());
+
+            await _unitOfWork.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ActivarCuentaAsync(string numeroCuenta)
+        {
+            if (string.IsNullOrWhiteSpace(numeroCuenta)) throw new ArgumentException("numeroCuenta es requerido", nameof(numeroCuenta));
+
+            var cuenta = await _context.Cuentas.FindAsync(numeroCuenta);
+            if (cuenta == null) return false;
+
+            if (string.Equals(cuenta.NombreEstado, "Activa", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("La cuenta ya se encuentra activa.");
+
+            cuenta.CambiarEstado(new EstadoCuentaActiva());
+
+            await _unitOfWork.SaveChangesAsync();
+            return true;
         }
     }
 }

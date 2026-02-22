@@ -6,6 +6,7 @@ namespace Domain.Patterns.State;
 
 public class EstadoCuentaBloqueada : IEstadoCuenta
 {
+    public string Nombre => "Bloqueada";
     public void Depositar(Cuenta cuenta, double monto)
     {
         throw new InvalidOperationException("No se pueden realizar depósitos en una cuenta bloqueada.");

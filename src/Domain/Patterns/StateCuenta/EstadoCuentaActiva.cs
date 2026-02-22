@@ -6,6 +6,7 @@ namespace Domain.Patterns.State;
 
 public class EstadoCuentaActiva : IEstadoCuenta
 {
+    public string Nombre => "Activa";
     public void Depositar(Cuenta cuenta, double monto)
     {
         if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser positivo.");
@@ -17,11 +18,6 @@ public class EstadoCuentaActiva : IEstadoCuenta
     public void Retirar(Cuenta cuenta, double monto)
     {
         if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser positivo.");
-
-        // NO validar saldo aquí porque cada tipo de cuenta tiene sus propias reglas:
-        // - CuentaAhorros: no permite saldo negativo
-        // - CuentaCorriente: permite sobregiro hasta un límite
-        // La validación ya se hizo en CuentaAhorros.Retirar() o CuentaCorriente.Retirar()
 
         cuenta.ModificarSaldo(-monto);
     }

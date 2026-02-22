@@ -164,6 +164,48 @@ public class CuentasController : ControllerBase
         }
     }
 
+    [HttpPost("{numero}/bloquear")]
+    public async Task<IActionResult> BloquearCuenta(string numero)
+    {
+        if (string.IsNullOrWhiteSpace(numero)) return BadRequest("Numero de cuenta es requerido.");
+
+        try
+        {
+            var ok = await _cuentaUseCase.BloquearCuentaAsync(numero);
+            if (!ok) return NotFound(new { error = "Cuenta no encontrada." });
+            return Ok(new { Mensaje = "Cuenta bloqueada." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error al bloquear la cuenta", detalle = ex.Message });
+        }
+    }
+
+    [HttpPost("{numero}/activar")]
+    public async Task<IActionResult> ActivarCuenta(string numero)
+    {
+        if (string.IsNullOrWhiteSpace(numero)) return BadRequest("Numero de cuenta es requerido.");
+
+        try
+        {
+            var ok = await _cuentaUseCase.ActivarCuentaAsync(numero);
+            if (!ok) return NotFound(new { error = "Cuenta no encontrada." });
+            return Ok(new { Mensaje = "Cuenta activada." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Error al activar la cuenta", detalle = ex.Message });
+        }
+    }
+
 
     [HttpGet("{numero}")]
     public async Task<IActionResult> Get(string numero)

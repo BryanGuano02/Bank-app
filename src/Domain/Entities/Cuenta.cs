@@ -27,14 +27,13 @@ namespace Domain.Entities
 
         // Foreign key property for the one-to-one relationship with Cliente
         public string? ClienteCedula { get; private set; }
+        public string NombreEstado => _estado.Nombre;
 
-        // Parameterless constructor for EF Core
         protected Cuenta()
         {
             NumeroCuenta = string.Empty;
             Saldo = 0.0;
             FechaApertura = DateTime.UtcNow;
-            // Assign a sensible default state when EF materializes the entity
             _estado = new EstadoCuentaActiva();
         }
 
@@ -56,6 +55,7 @@ namespace Domain.Entities
         {
             _estado = nuevoEstado;
         }
+
 
         internal void ModificarSaldo(double monto)
         {
