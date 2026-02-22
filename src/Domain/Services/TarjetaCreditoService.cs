@@ -5,7 +5,7 @@ namespace Domain.Services;
 
 public class TarjetaCreditoService
 {
-    private const int NUMERO_TARJETA_LEN = 16;
+    private const int NUMERO_TARJETA_LEN = 10;
     private const double LIMITE_CREDITO_DEFAULT = 8000.00;
     private const double TASA_INTERES_MENSUAL_DEFAULT = 3.50;
 
