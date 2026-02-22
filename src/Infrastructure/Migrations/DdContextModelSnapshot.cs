@@ -82,8 +82,8 @@ namespace Fast_Bank.Infrastructure.Migrations
                     b.Property<DateTime>("FechaApertura")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Saldo")
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Saldo")
+                        .HasColumnType("REAL");
 
                     b.Property<string>("TipoCuenta")
                         .IsRequired()
@@ -117,8 +117,8 @@ namespace Fast_Bank.Infrastructure.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Monto")
-                        .HasColumnType("TEXT");
+                    b.Property<double>("Monto")
+                        .HasColumnType("REAL");
 
                     b.Property<string>("OrigenNumeroCuenta")
                         .HasColumnType("TEXT");
@@ -178,9 +178,6 @@ namespace Fast_Bank.Infrastructure.Migrations
                 {
                     b.HasBaseType("Domain.Entities.Cuenta");
 
-                    b.Property<double>("TasaInteres")
-                        .HasColumnType("REAL");
-
                     b.HasDiscriminator().HasValue("Ahorros");
                 });
 
@@ -188,11 +185,11 @@ namespace Fast_Bank.Infrastructure.Migrations
                 {
                     b.HasBaseType("Domain.Entities.Cuenta");
 
-                    b.Property<decimal>("InteresSobregiro")
-                        .HasColumnType("TEXT");
+                    b.Property<double>("InteresSobregiro")
+                        .HasColumnType("REAL");
 
-                    b.Property<decimal>("LimiteSobregiro")
-                        .HasColumnType("TEXT");
+                    b.Property<double>("LimiteSobregiro")
+                        .HasColumnType("REAL");
 
                     b.HasDiscriminator().HasValue("Corriente");
                 });

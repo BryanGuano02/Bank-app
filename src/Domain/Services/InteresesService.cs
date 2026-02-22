@@ -7,25 +7,25 @@ namespace Domain.Services
 {
     public class InteresesService
     {
-        public decimal CalcularInteresMensual(CuentaAhorros cuenta)
+        public double CalcularInteresMensual(CuentaAhorros cuenta)
         {
             if (cuenta == null) throw new ArgumentNullException(nameof(cuenta));
-            if (cuenta.TasaInteres < 0) throw new ArgumentOutOfRangeException(nameof(cuenta.TasaInteres), "La tasa de inter�s no puede ser negativa.");
+            if (CuentaAhorros.TASA_INTERES_AHORROS < 0) throw new ArgumentOutOfRangeException(nameof(CuentaAhorros.TASA_INTERES_AHORROS), "La tasa de inter�s no puede ser negativa.");
 
             // F�rmula: Inter�s = Saldo * (TasaInteres / 12)
-            // TasaInteres es anual, dividimos entre 12 para obtener la mensual
-            var interesMensual = cuenta.Saldo * (decimal)(cuenta.TasaInteres / (12 * 100));
+            // TasaInteres es anual en porcentaje (ej. 3.0 => 3%), por eso dividimos entre 12*100
+            var interesMensual = cuenta.Saldo * (CuentaAhorros.TASA_INTERES_AHORROS / (12.0 * 100.0));
 
             return FinancialRounding.RoundMoney(interesMensual);
         }
 
-        public Movimiento CrearYEjecutarAcreditacionInteres(string idMovimiento, CuentaAhorros cuenta, decimal montoInteres)
+        public Movimiento CrearYEjecutarAcreditacionInteres(string idMovimiento, CuentaAhorros cuenta, double montoInteres)
         {
             if (cuenta == null) throw new ArgumentNullException(nameof(cuenta));
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inv�lido.", nameof(idMovimiento));
             if (montoInteres <= 0) throw new ArgumentOutOfRangeException(nameof(montoInteres), "El monto de inter�s debe ser mayor que cero.");
 
-            var descripcion = $"Inter�s mensual - Tasa: {cuenta.TasaInteres:P2}";
+            var descripcion = $"Inter�s mensual - Tasa: {CuentaAhorros.TASA_INTERES_AHORROS:P2}";
 
             var movimiento = Movimiento.Create(
                 idMovimiento,
@@ -42,7 +42,7 @@ namespace Domain.Services
             return movimiento;
         }
 
-        public decimal CalcularInteresSobregiro(CuentaCorriente cuenta)
+        public double CalcularInteresSobregiro(CuentaCorriente cuenta)
         {
             if (cuenta == null) throw new ArgumentNullException(nameof(cuenta));
 
@@ -58,7 +58,7 @@ namespace Domain.Services
             return FinancialRounding.RoundMoney(interesSobregiro);
         }
 
-        public Movimiento CrearYEjecutarCargoInteresSobregiro(string idMovimiento, CuentaCorriente cuenta, decimal montoInteres)
+        public Movimiento CrearYEjecutarCargoInteresSobregiro(string idMovimiento, CuentaCorriente cuenta, double montoInteres)
         {
             if (cuenta == null) throw new ArgumentNullException(nameof(cuenta));
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inv�lido.", nameof(idMovimiento));

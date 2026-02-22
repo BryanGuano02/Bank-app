@@ -10,7 +10,7 @@ namespace Domain.Entities
     {
         [Key]
         public string IdMovimiento { get; private set; }
-        public decimal Monto { get; private set; }
+        public double Monto { get; private set; }
         public DateTime Fecha { get; private set; }
         public string Descripcion { get; private set; }
 
@@ -25,7 +25,7 @@ namespace Domain.Entities
 
         // --- CONSTRUCTORES ---
 
-        public static Movimiento Create(string idMovimiento, decimal monto, Cuenta? origen, Cuenta destino, string descripcion, ITipoMovimiento estrategia)
+        public static Movimiento Create(string idMovimiento, double monto, Cuenta? origen, Cuenta destino, string descripcion, ITipoMovimiento estrategia)
         {
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.");
             if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser > 0.");
@@ -46,7 +46,7 @@ namespace Domain.Entities
         }
 
         // Constructor PROTEGIDO para EF Core (Materialización)
-        protected Movimiento(string idMovimiento, decimal monto, string tipo, string descripcion, DateTime fecha)
+        protected Movimiento(string idMovimiento, double monto, string tipo, string descripcion, DateTime fecha)
         {
             IdMovimiento = idMovimiento;
             Monto = monto;

@@ -33,7 +33,7 @@ namespace Domain.Services
             }
         }
 
-        public CuentaCorriente CrearCuentaCorriente(Cliente cliente, decimal saldoInicial)
+        public CuentaCorriente CrearCuentaCorriente(Cliente cliente, double saldoInicial)
         {
             if (cliente == null) throw new ArgumentNullException(nameof(cliente));
 
@@ -48,7 +48,7 @@ namespace Domain.Services
             return cuenta;
         }
 
-        public CuentaAhorros CrearCuentaAhorros(Cliente cliente, decimal saldoInicial)
+        public CuentaAhorros CrearCuentaAhorros(Cliente cliente, double saldoInicial)
         {
             if (cliente == null) throw new ArgumentNullException(nameof(cliente));
 

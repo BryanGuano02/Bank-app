@@ -42,7 +42,7 @@ namespace Fast_Bank.Application.Services
             var movimientos = await _context.Movimientos
                 .Include(m => m.Origen)
                 .Include(m => m.Destino)
-                .Where(m => (m.Origen != null && m.Origen.NumeroCuenta == numeroCuenta) || 
+                .Where(m => (m.Origen != null && m.Origen.NumeroCuenta == numeroCuenta) ||
                             m.Destino.NumeroCuenta == numeroCuenta)
                 .OrderByDescending(m => m.Fecha)
                 .ToListAsync();
@@ -70,7 +70,7 @@ namespace Fast_Bank.Application.Services
     {
         public string IdMovimiento { get; set; } = string.Empty;
         public string Tipo { get; set; } = string.Empty;
-        public decimal Monto { get; set; }
+        public double Monto { get; set; }
         public DateTime Fecha { get; set; }
         public string Descripcion { get; set; } = string.Empty;
         public string? CuentaOrigen { get; set; }

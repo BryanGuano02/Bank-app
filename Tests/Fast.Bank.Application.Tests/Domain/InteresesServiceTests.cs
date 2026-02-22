@@ -19,22 +19,22 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CalcularInteresMensual_ConDatosValidos_RetornaInteresRedondeado()
         {
             // Arrange
-            var cuenta = CuentaAhorros.Create("A100", 1000m, new EstadoCuentaActiva());
+            var cuenta = CuentaAhorros.Create("A100", 1000.0, new EstadoCuentaActiva());
 
             // Act
             var interes = _service.CalcularInteresMensual(cuenta);
 
             // Assert
-            Assert.Equal(2.5m, interes); // 1000 * 3% / 12 = 2.5
+            Assert.Equal(2.5, interes); // 1000 * 3% / 12 = 2.5
         }
 
         [Fact]
         public void CrearYEjecutarAcreditacionInteres_ConDatosValidos_AcreditaSaldo()
         {
             // Arrange
-            var cuenta = CuentaAhorros.Create("A200", 500m, new EstadoCuentaActiva());
+            var cuenta = CuentaAhorros.Create("A200", 500.0, new EstadoCuentaActiva());
             var id = Guid.NewGuid().ToString();
-            var monto = 5.12m;
+            var monto = 5.12;
 
             // Act
             var movimiento = _service.CrearYEjecutarAcreditacionInteres(id, cuenta, monto);
@@ -42,7 +42,7 @@ namespace Fast.Bank.Application.Tests.Domain
             // Assert
             Assert.NotNull(movimiento);
             Assert.Equal(monto, movimiento.Monto);
-            Assert.Equal(500m + monto, cuenta.Saldo);
+            Assert.Equal(500.0 + monto, cuenta.Saldo);
             Assert.Contains("Inter�s mensual", movimiento.Descripcion);
             Assert.Equal(cuenta, movimiento.Destino);
         }
@@ -51,7 +51,7 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarAcreditacionInteres_CuentaNula_DebeLanzarArgumentNullException()
         {
             var id = Guid.NewGuid().ToString();
-            var monto = 1m;
+            var monto = 1.0;
 
             Assert.Throws<ArgumentNullException>(() => _service.CrearYEjecutarAcreditacionInteres(id, null!, monto));
         }
@@ -62,8 +62,8 @@ namespace Fast.Bank.Application.Tests.Domain
         [InlineData("   ")]
         public void CrearYEjecutarAcreditacionInteres_IdInvalido_DebeLanzarArgumentException(string id)
         {
-            var cuenta = CuentaAhorros.Create("A300", 100m, new EstadoCuentaActiva());
-            var monto = 1m;
+            var cuenta = CuentaAhorros.Create("A300", 100.0, new EstadoCuentaActiva());
+            var monto = 1.0;
 
             Assert.Throws<ArgumentException>(() => _service.CrearYEjecutarAcreditacionInteres(id!, cuenta, monto));
         }
@@ -71,9 +71,9 @@ namespace Fast.Bank.Application.Tests.Domain
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
-        public void CrearYEjecutarAcreditacionInteres_MontoInvalido_DebeLanzarArgumentOutOfRange(decimal monto)
+        public void CrearYEjecutarAcreditacionInteres_MontoInvalido_DebeLanzarArgumentOutOfRange(double monto)
         {
-            var cuenta = CuentaAhorros.Create("A400", 100m, new EstadoCuentaActiva());
+            var cuenta = CuentaAhorros.Create("A400", 100.0, new EstadoCuentaActiva());
             var id = Guid.NewGuid().ToString();
 
             Assert.Throws<ArgumentOutOfRangeException>(() => _service.CrearYEjecutarAcreditacionInteres(id, cuenta, monto));

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fast_Bank.Infrastructure.Migrations
 {
     [DbContext(typeof(DdContext))]
-    [Migration("20260221195044_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260222164202_AddClienteCedulaToCuenta")]
+    partial class AddClienteCedulaToCuenta
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,7 +86,7 @@ namespace Fast_Bank.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Saldo")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
                     b.Property<string>("TipoCuenta")
                         .IsRequired()
@@ -121,7 +121,7 @@ namespace Fast_Bank.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Monto")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
                     b.Property<string>("OrigenNumeroCuenta")
                         .HasColumnType("TEXT");
@@ -181,9 +181,6 @@ namespace Fast_Bank.Infrastructure.Migrations
                 {
                     b.HasBaseType("Domain.Entities.Cuenta");
 
-                    b.Property<double>("TasaInteres")
-                        .HasColumnType("REAL");
-
                     b.HasDiscriminator().HasValue("Ahorros");
                 });
 
@@ -192,10 +189,10 @@ namespace Fast_Bank.Infrastructure.Migrations
                     b.HasBaseType("Domain.Entities.Cuenta");
 
                     b.Property<double>("InteresSobregiro")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
                     b.Property<double>("LimiteSobregiro")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
                     b.HasDiscriminator().HasValue("Corriente");
                 });

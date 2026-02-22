@@ -47,13 +47,13 @@ namespace Fast_Bank.Infrastructure.Migrations
                 columns: table => new
                 {
                     NumeroCuenta = table.Column<string>(type: "TEXT", nullable: false),
-                    Saldo = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Saldo = table.Column<double>(type: "TEXT", nullable: false),
                     FechaApertura = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ClienteCedula = table.Column<string>(type: "TEXT", nullable: true),
                     TipoCuenta = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
                     TasaInteres = table.Column<double>(type: "REAL", nullable: true),
-                    LimiteSobregiro = table.Column<decimal>(type: "TEXT", nullable: true),
-                    InteresSobregiro = table.Column<decimal>(type: "TEXT", nullable: true)
+                    LimiteSobregiro = table.Column<double>(type: "TEXT", nullable: true),
+                    InteresSobregiro = table.Column<double>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -95,7 +95,7 @@ namespace Fast_Bank.Infrastructure.Migrations
                 columns: table => new
                 {
                     IdMovimiento = table.Column<string>(type: "TEXT", nullable: false),
-                    Monto = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Monto = table.Column<double>(type: "TEXT", nullable: false),
                     Fecha = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Descripcion = table.Column<string>(type: "TEXT", nullable: false),
                     Tipo = table.Column<string>(type: "TEXT", nullable: false),

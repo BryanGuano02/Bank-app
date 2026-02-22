@@ -21,8 +21,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarDeposito_ConDatosValidos_DebeAumentarSaldoDeCuentaDestino()
         {
             // Arrange
-            var saldoInicial = 100m;
-            var montoDeposito = 50m;
+            var saldoInicial = 100.0;
+            var montoDeposito = 50.0;
             var cuentaDestino = CuentaAhorros.Create("12345", saldoInicial, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Depósito de prueba";
@@ -41,7 +41,7 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarDeposito_ConCuentaDestinoNula_DebeLanzarArgumentNullException()
         {
             // Arrange
-            var montoDeposito = 50m;
+            var montoDeposito = 50.0;
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Depósito de prueba";
 
@@ -59,8 +59,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarDeposito_ConIdMovimientoInvalido_DebeLanzarArgumentException(string idMovimiento)
         {
             // Arrange
-            var cuentaDestino = CuentaAhorros.Create("12345", 100m, new EstadoCuentaActiva());
-            var montoDeposito = 50m;
+            var cuentaDestino = CuentaAhorros.Create("12345", 100.0, new EstadoCuentaActiva());
+            var montoDeposito = 50.0;
             var descripcion = "Depósito de prueba";
 
             // Act & Assert
@@ -73,10 +73,10 @@ namespace Fast.Bank.Application.Tests.Domain
         [Theory]
         [InlineData(0)]
         [InlineData(-50)]
-        public void CrearYEjecutarDeposito_ConMontoInvalido_DebeLanzarArgumentOutOfRangeException(decimal monto)
+        public void CrearYEjecutarDeposito_ConMontoInvalido_DebeLanzarArgumentOutOfRangeException(double monto)
         {
             // Arrange
-            var cuentaDestino = CuentaAhorros.Create("12345", 100m, new EstadoCuentaActiva());
+            var cuentaDestino = CuentaAhorros.Create("12345", 100.0, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Depósito de prueba";
 
@@ -92,8 +92,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarDeposito_ConMontoMayorAlPermitido_DebeLanzarInvalidOperationException()
         {
             // Arrange
-            var cuentaDestino = CuentaAhorros.Create("12345", 100m, new EstadoCuentaActiva());
-            var montoExcesivo = 5001m; // El límite es 5000
+            var cuentaDestino = CuentaAhorros.Create("12345", 100.0, new EstadoCuentaActiva());
+            var montoExcesivo = 5001.0; // El límite es 5000
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Depósito de prueba";
 
@@ -113,8 +113,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_ConDatosValidos_DebeDisminuirSaldoDeCuentaOrigen()
         {
             // Arrange
-            var saldoInicial = 1000m;
-            var montoRetiro = 300m;
+            var saldoInicial = 1000.0;
+            var montoRetiro = 300.0;
             var cuentaOrigen = CuentaAhorros.Create("12345", saldoInicial, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro de prueba";
@@ -133,7 +133,7 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_ConCuentaOrigenNula_DebeLanzarArgumentNullException()
         {
             // Arrange
-            var montoRetiro = 100m;
+            var montoRetiro = 100.0;
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro de prueba";
 
@@ -151,8 +151,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_ConIdMovimientoInvalido_DebeLanzarArgumentException(string idMovimiento)
         {
             // Arrange
-            var cuentaOrigen = CuentaAhorros.Create("12345", 1000m, new EstadoCuentaActiva());
-            var montoRetiro = 100m;
+            var cuentaOrigen = CuentaAhorros.Create("12345", 1000.0, new EstadoCuentaActiva());
+            var montoRetiro = 100.0;
             var descripcion = "Retiro de prueba";
 
             // Act & Assert
@@ -165,10 +165,10 @@ namespace Fast.Bank.Application.Tests.Domain
         [Theory]
         [InlineData(0)]
         [InlineData(-100)]
-        public void CrearYEjecutarRetiro_ConMontoInvalido_DebeLanzarArgumentOutOfRangeException(decimal monto)
+        public void CrearYEjecutarRetiro_ConMontoInvalido_DebeLanzarArgumentOutOfRangeException(double monto)
         {
             // Arrange
-            var cuentaOrigen = CuentaAhorros.Create("12345", 1000m, new EstadoCuentaActiva());
+            var cuentaOrigen = CuentaAhorros.Create("12345", 1000.0, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro de prueba";
 
@@ -183,8 +183,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_ConMontoMayorAlPermitido_DebeLanzarInvalidOperationException()
         {
             // Arrange - CA5: El monto máximo por movimiento no puede exceder 5000
-            var cuentaOrigen = CuentaAhorros.Create("12345", 10000m, new EstadoCuentaActiva());
-            var montoExcesivo = 5001m; // El límite es 5000
+            var cuentaOrigen = CuentaAhorros.Create("12345", 10000.0, new EstadoCuentaActiva());
+            var montoExcesivo = 5001.0; // El límite es 5000
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro de prueba";
 
@@ -199,8 +199,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_CuentaAhorros_ConSaldoInsuficiente_DebeLanzarInvalidOperationException()
         {
             // Arrange - CA3: Para cuentas de ahorros no se permite dejar saldo negativo
-            var saldoInicial = 500m;
-            var montoRetiro = 600m; // Más que el saldo
+            var saldoInicial = 500.0;
+            var montoRetiro = 600.0; // Más que el saldo
             var cuentaOrigen = CuentaAhorros.Create("12345", saldoInicial, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro de prueba";
@@ -216,9 +216,9 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_CuentaCorriente_DentroDeLimiteSobregiro_DebePermitirRetiro()
         {
             // Arrange - CA2: Para cuentas corrientes, se permite saldo negativo hasta el límite de sobregiro (200m)
-            var saldoInicial = 500m;
-            var limiteSobregiro = 200m; // Límite definido en CuentaCorriente
-            var montoRetiro = 600m; // Mayor que el saldo, pero dentro del límite de sobregiro (500 + 200 = 700)
+            var saldoInicial = 500.0;
+            var limiteSobregiro = 200.0; // Límite definido en CuentaCorriente
+            var montoRetiro = 600.0; // Mayor que el saldo, pero dentro del límite de sobregiro (500 + 200 = 700)
             var cuentaOrigen = new CuentaCorriente("67890", saldoInicial, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro con sobregiro";
@@ -228,7 +228,7 @@ namespace Fast.Bank.Application.Tests.Domain
 
             // Assert
             Assert.NotNull(movimiento);
-            Assert.Equal(saldoInicial - montoRetiro, cuentaOrigen.Saldo); // Saldo negativo (-100m)
+            Assert.Equal(saldoInicial - montoRetiro, cuentaOrigen.Saldo); // Saldo negativo (-100.0)
             Assert.True(cuentaOrigen.Saldo < 0); // Confirmar que el saldo es negativo
             Assert.True(cuentaOrigen.Saldo >= -limiteSobregiro); // Pero dentro del límite
         }
@@ -237,8 +237,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_CuentaCorriente_ExcedeLimiteSobregiro_DebeLanzarInvalidOperationException()
         {
             // Arrange - CA2: El sobregiro tiene un límite
-            var saldoInicial = 500m;
-            var montoRetiro = 2000m; // Excede saldo + sobregiro (500 + 1000 = 1500)
+            var saldoInicial = 500.0;
+            var montoRetiro = 2000.0; // Excede saldo + sobregiro (500 + 1000 = 1500)
             var cuentaOrigen = new CuentaCorriente("67890", saldoInicial, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro excesivo";
@@ -254,8 +254,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarRetiro_CuentaAhorros_RetiroExactoDelSaldo_DebeDejaSaldoEnCero()
         {
             // Arrange - Caso borde: retirar exactamente todo el saldo
-            var saldoInicial = 1000m;
-            var montoRetiro = 1000m;
+            var saldoInicial = 1000.0;
+            var montoRetiro = 1000.0;
             var cuentaOrigen = CuentaAhorros.Create("12345", saldoInicial, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro total";
@@ -265,15 +265,15 @@ namespace Fast.Bank.Application.Tests.Domain
 
             // Assert
             Assert.NotNull(movimiento);
-            Assert.Equal(0m, cuentaOrigen.Saldo);
+            Assert.Equal(0.0, cuentaOrigen.Saldo);
         }
 
         [Fact]
         public void CrearYEjecutarRetiro_VerificarTipoDeMovimiento_DebeSerRetiro()
         {
             // Arrange
-            var cuentaOrigen = CuentaAhorros.Create("12345", 1000m, new EstadoCuentaActiva());
-            var montoRetiro = 200m;
+            var cuentaOrigen = CuentaAhorros.Create("12345", 1000.0, new EstadoCuentaActiva());
+            var montoRetiro = 200.0;
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Retiro de prueba";
 
@@ -294,9 +294,9 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_ConDatosValidos_DebeTransferirSaldoEntreCuentas()
         {
             // Arrange - CA1: La cuenta origen y la cuenta destino deben existir
-            var saldoInicialOrigen = 1000m;
-            var saldoInicialDestino = 500m;
-            var montoTransferencia = 300m;
+            var saldoInicialOrigen = 1000.0;
+            var saldoInicialDestino = 500.0;
+            var montoTransferencia = 300.0;
             var cuentaOrigen = CuentaAhorros.Create("12345", saldoInicialOrigen, new EstadoCuentaActiva());
             var cuentaDestino = CuentaAhorros.Create("67890", saldoInicialDestino, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
@@ -317,8 +317,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_ConCuentaOrigenNula_DebeLanzarArgumentNullException()
         {
             // Arrange - CA1: La cuenta origen debe existir
-            var cuentaDestino = CuentaAhorros.Create("67890", 500m, new EstadoCuentaActiva());
-            var montoTransferencia = 100m;
+            var cuentaDestino = CuentaAhorros.Create("67890", 500.0, new EstadoCuentaActiva());
+            var montoTransferencia = 100.0;
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Transferencia de prueba";
 
@@ -333,8 +333,8 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_ConCuentaDestinoNula_DebeLanzarArgumentNullException()
         {
             // Arrange - CA1: La cuenta destino debe existir
-            var cuentaOrigen = CuentaAhorros.Create("12345", 1000m, new EstadoCuentaActiva());
-            var montoTransferencia = 100m;
+            var cuentaOrigen = CuentaAhorros.Create("12345", 1000.0, new EstadoCuentaActiva());
+            var montoTransferencia = 100.0;
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Transferencia de prueba";
 
@@ -352,9 +352,9 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_ConIdMovimientoInvalido_DebeLanzarArgumentException(string idMovimiento)
         {
             // Arrange
-            var cuentaOrigen = CuentaAhorros.Create("12345", 1000m, new EstadoCuentaActiva());
-            var cuentaDestino = CuentaAhorros.Create("67890", 500m, new EstadoCuentaActiva());
-            var montoTransferencia = 100m;
+            var cuentaOrigen = CuentaAhorros.Create("12345", 1000.0, new EstadoCuentaActiva());
+            var cuentaDestino = CuentaAhorros.Create("67890", 500.0, new EstadoCuentaActiva());
+            var montoTransferencia = 100.0;
             var descripcion = "Transferencia de prueba";
 
             // Act & Assert
@@ -367,11 +367,11 @@ namespace Fast.Bank.Application.Tests.Domain
         [Theory]
         [InlineData(0)]
         [InlineData(-100)]
-        public void CrearYEjecutarTransferencia_ConMontoInvalido_DebeLanzarArgumentOutOfRangeException(decimal monto)
+        public void CrearYEjecutarTransferencia_ConMontoInvalido_DebeLanzarArgumentOutOfRangeException(double monto)
         {
             // Arrange
-            var cuentaOrigen = CuentaAhorros.Create("12345", 1000m, new EstadoCuentaActiva());
-            var cuentaDestino = CuentaAhorros.Create("67890", 500m, new EstadoCuentaActiva());
+            var cuentaOrigen = CuentaAhorros.Create("12345", 1000.0, new EstadoCuentaActiva());
+            var cuentaDestino = CuentaAhorros.Create("67890", 500.0, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Transferencia de prueba";
 
@@ -386,9 +386,9 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_ConMontoMayorAlPermitido_DebeLanzarInvalidOperationException()
         {
             // Arrange - CA3: El monto máximo permitido por transferencia es 5000
-            var cuentaOrigen = CuentaAhorros.Create("12345", 10000m, new EstadoCuentaActiva());
-            var cuentaDestino = CuentaAhorros.Create("67890", 500m, new EstadoCuentaActiva());
-            var montoExcesivo = 5001m; // El límite es 5000
+            var cuentaOrigen = CuentaAhorros.Create("12345", 10000.0, new EstadoCuentaActiva());
+            var cuentaDestino = CuentaAhorros.Create("67890", 500.0, new EstadoCuentaActiva());
+            var montoExcesivo = 5001.0; // El límite es 5000
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Transferencia de prueba";
 
@@ -403,10 +403,10 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_CuentaAhorrosOrigen_ConSaldoInsuficiente_DebeLanzarInvalidOperationException()
         {
             // Arrange - CA4: Para cuenta de ahorros, no se permite dejar saldo negativo
-            var saldoInicialOrigen = 500m;
-            var montoTransferencia = 600m; // Más que el saldo
+            var saldoInicialOrigen = 500.0;
+            var montoTransferencia = 600.0; // Más que el saldo
             var cuentaOrigen = CuentaAhorros.Create("12345", saldoInicialOrigen, new EstadoCuentaActiva());
-            var cuentaDestino = CuentaAhorros.Create("67890", 500m, new EstadoCuentaActiva());
+            var cuentaDestino = CuentaAhorros.Create("67890", 500.0, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Transferencia de prueba";
 
@@ -421,10 +421,10 @@ namespace Fast.Bank.Application.Tests.Domain
         // public void CrearYEjecutarTransferencia_CuentaCorrienteOrigen_DentroDeLimiteSobregiro_DebePermitirTransferencia()
         // {
         //     // Arrange - CA4: Para cuenta corriente, se permite sobregiro hasta el límite configurado
-        //     var saldoInicialOrigen = 500m;
-        //     var montoTransferencia = 800m; // Mayor que el saldo, pero dentro del límite de sobregiro
+        //     var saldoInicialOrigen = 500.0;
+        //     var montoTransferencia = 800.0; // Mayor que el saldo, pero dentro del límite de sobregiro
         //     var cuentaOrigen = new CuentaCorriente("12345", saldoInicialOrigen, new EstadoCuentaActiva());
-        //     var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+        //     var cuentaDestino = new CuentaAhorros("67890", 500.0, 0.01, new EstadoCuentaActiva());
         //     var idMovimiento = Guid.NewGuid().ToString();
         //     var descripcion = "Transferencia con sobregiro";
 
@@ -442,10 +442,10 @@ namespace Fast.Bank.Application.Tests.Domain
                 public void CrearYEjecutarTransferencia_CuentaCorrienteOrigen_ExcedeLimiteSobregiro_DebeLanzarInvalidOperationException()
                 {
                     // Arrange - CA4: El sobregiro tiene un límite
-                    var saldoInicialOrigen = 500m;
-                    var montoTransferencia = 2000m; // Excede saldo + sobregiro (500 + 1000 = 1500)
+                    var saldoInicialOrigen = 500.0;
+                    var montoTransferencia = 2000.0; // Excede saldo + sobregiro (500 + 1000 = 1500)
                     var cuentaOrigen = new CuentaCorriente("12345", saldoInicialOrigen, new EstadoCuentaActiva());
-                    var cuentaDestino = new CuentaAhorros("67890", 500m, 0.01, new EstadoCuentaActiva());
+                    var cuentaDestino = new CuentaAhorros("67890", 500.0, 0.01, new EstadoCuentaActiva());
                     var idMovimiento = Guid.NewGuid().ToString();
                     var descripcion = "Transferencia excesiva";
 
@@ -460,9 +460,9 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_VerificarTipoDeMovimiento_DebeSerTransferencia()
         {
             // Arrange - CA5: El movimiento debe registrarse con fecha, monto, tipo y cuenta destino
-            var cuentaOrigen = CuentaAhorros.Create("12345", 1000m, new EstadoCuentaActiva());
-            var cuentaDestino = CuentaAhorros.Create("67890", 500m, new EstadoCuentaActiva());
-            var montoTransferencia = 200m;
+            var cuentaOrigen = CuentaAhorros.Create("12345", 1000.0, new EstadoCuentaActiva());
+            var cuentaDestino = CuentaAhorros.Create("67890", 500.0, new EstadoCuentaActiva());
+            var montoTransferencia = 200.0;
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Transferencia de prueba";
 
@@ -481,9 +481,9 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_EntreDosCuentasAhorros_DebeManipularAmbosUsuarios()
         {
             // Arrange - Escenario realista: Juan transfiere a María
-            var saldoJuan = 2000m;
-            var saldoMaria = 1500m;
-            var montoTransferencia = 750m;
+            var saldoJuan = 2000.0;
+            var saldoMaria = 1500.0;
+            var montoTransferencia = 750.0;
             var cuentaJuan = CuentaAhorros.Create("JUAN-001", saldoJuan, new EstadoCuentaActiva());
             var cuentaMaria = CuentaAhorros.Create("MARIA-001", saldoMaria, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
@@ -493,8 +493,8 @@ namespace Fast.Bank.Application.Tests.Domain
             var movimiento = _movimientoService.Transferir(idMovimiento, cuentaJuan, cuentaMaria, montoTransferencia, descripcion);
 
             // Assert
-            Assert.Equal(2000m - 750m, cuentaJuan.Saldo);     // Juan queda con 1250
-            Assert.Equal(1500m + 750m, cuentaMaria.Saldo);    // María queda con 2250
+            Assert.Equal(2000.0 - 750.0, cuentaJuan.Saldo);     // Juan queda con 1250
+            Assert.Equal(1500.0 + 750.0, cuentaMaria.Saldo);    // María queda con 2250
             Assert.Equal("Pago de alquiler", movimiento.Descripcion);
         }
 
@@ -502,10 +502,10 @@ namespace Fast.Bank.Application.Tests.Domain
         public void CrearYEjecutarTransferencia_TransferirTodoElSaldo_DebeDejaSaldoOrigenEnCero()
         {
             // Arrange - Caso borde: transferir exactamente todo el saldo
-            var saldoInicialOrigen = 1000m;
-            var montoTransferencia = 1000m;
+            var saldoInicialOrigen = 1000.0;
+            var montoTransferencia = 1000.0;
             var cuentaOrigen = CuentaAhorros.Create("12345", saldoInicialOrigen, new EstadoCuentaActiva());
-            var cuentaDestino = CuentaAhorros.Create("67890", 500m, new EstadoCuentaActiva());
+            var cuentaDestino = CuentaAhorros.Create("67890", 500, new EstadoCuentaActiva());
             var idMovimiento = Guid.NewGuid().ToString();
             var descripcion = "Transferencia total";
 
@@ -513,8 +513,8 @@ namespace Fast.Bank.Application.Tests.Domain
             var movimiento = _movimientoService.Transferir(idMovimiento, cuentaOrigen, cuentaDestino, montoTransferencia, descripcion);
 
             // Assert
-            Assert.Equal(0m, cuentaOrigen.Saldo);
-            Assert.Equal(500m + 1000m, cuentaDestino.Saldo);
+            Assert.Equal(0.0, cuentaOrigen.Saldo);
+            Assert.Equal(500.0 + 1000.0, cuentaDestino.Saldo);
         }
 
         #endregion

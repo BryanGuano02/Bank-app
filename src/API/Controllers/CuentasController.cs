@@ -21,14 +21,14 @@ public class CuentasController : ControllerBase
     public class DepositoRequest
     {
         public string NumeroCuentaDestino { get; set; } = string.Empty;
-        public decimal Monto { get; set; }
+        public double Monto { get; set; }
         public string? Descripcion { get; set; }
     }
 
     public class RetiroRequest
     {
         public string NumeroCuentaOrigen { get; set; } = string.Empty;
-        public decimal Monto { get; set; }
+        public double Monto { get; set; }
         public string? Descripcion { get; set; }
     }
 
@@ -36,7 +36,7 @@ public class CuentasController : ControllerBase
     {
         public string NumeroCuentaOrigen { get; set; } = string.Empty;
         public string NumeroCuentaDestino { get; set; } = string.Empty;
-        public decimal Monto { get; set; }
+        public double Monto { get; set; }
         public string? Descripcion { get; set; }
     }
 

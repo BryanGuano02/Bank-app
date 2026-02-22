@@ -4,7 +4,7 @@ namespace Domain.Interfaces.States
 {
     public interface IEstadoCuenta
     {
-        void Depositar(Cuenta cuenta, decimal monto);
-        void Retirar(Cuenta cuenta, decimal monto);
+        void Depositar(Cuenta cuenta, double monto);
+        void Retirar(Cuenta cuenta, double monto);
     }
 }

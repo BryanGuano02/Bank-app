@@ -57,7 +57,7 @@ namespace Fast_Bank.Application.Services
                     TipoCuenta = "Ahorros",
                     Saldo = Domain.Utils.FinancialRounding.RoundMoney(cuenta.Saldo),
                     FechaApertura = cuenta.FechaApertura,
-                    TasaInteres = cuentaAhorros.TasaInteres
+                    TasaInteres = CuentaAhorros.TASA_INTERES_AHORROS
                 };
             }
             else

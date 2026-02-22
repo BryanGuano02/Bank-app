@@ -13,7 +13,7 @@ namespace Domain.Services
 
         public Cliente CrearClienteConCuentaCorriente(
             string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-            decimal saldoInicial)
+            double saldoInicial)
         {
             var cliente = Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
             _cuentaService.CrearCuentaCorriente(cliente, saldoInicial);
@@ -22,7 +22,7 @@ namespace Domain.Services
 
         public Cliente CrearClienteConCuentaAhorros(
             string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-            decimal saldoInicial)
+            double saldoInicial)
         {
             var cliente = Cliente.Create(cedula, nombre, apellido, direccion, correo, telefono);
             _cuentaService.CrearCuentaAhorros(cliente, saldoInicial);

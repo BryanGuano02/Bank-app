@@ -6,7 +6,7 @@ namespace Domain.Patterns.State;
 
 public class EstadoCuentaActiva : IEstadoCuenta
 {
-    public void Depositar(Cuenta cuenta, decimal monto)
+    public void Depositar(Cuenta cuenta, double monto)
     {
         if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser positivo.");
 
@@ -14,7 +14,7 @@ public class EstadoCuentaActiva : IEstadoCuenta
         cuenta.ModificarSaldo(monto);
     }
 
-    public void Retirar(Cuenta cuenta, decimal monto)
+    public void Retirar(Cuenta cuenta, double monto)
     {
         if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser positivo.");
 
@@ -23,19 +23,15 @@ public class EstadoCuentaActiva : IEstadoCuenta
         // - CuentaCorriente: permite sobregiro hasta un límite
         // La validación ya se hizo en CuentaAhorros.Retirar() o CuentaCorriente.Retirar()
 
-        // No generic saldo validation here: each account type handles its own validation logic.
-        // if (cuenta.Saldo < monto) throw new InvalidOperationException("Saldo insuficiente.");
-
         cuenta.ModificarSaldo(-monto);
     }
 
-    public void Transferir(Cuenta cuenta, Cuenta destino, decimal monto)
+    public void Transferir(Cuenta cuenta, Cuenta destino, double monto)
     {
         // Reutilizamos la lógica de retiro para el origen
         Retirar(cuenta, monto);
 
         // Y depositamos en el destino (asumiendo que el destino también sabe depositarse)
-        // Nota: En un diseño puro, el destino también debería usar su propio State.
         destino.Depositar(monto);
     }
 

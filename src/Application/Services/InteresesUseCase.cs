@@ -51,7 +51,7 @@ namespace Fast_Bank.Application.Services
                             montoInteres,
                             null,
                             cuenta,
-                            $"Interés mensual - Tasa: {cuenta.TasaInteres:P2}",
+                            $"Interés mensual - Tasa: {CuentaAhorros.TASA_INTERES_AHORROS:P2}",
                             new InteresTipo()
                         );
 
@@ -65,7 +65,7 @@ namespace Fast_Bank.Application.Services
                             SaldoAnterior = saldoAnterior,
                             MontoInteres = montoInteres,
                             SaldoNuevo = cuenta.Saldo,
-                            TasaAplicada = cuenta.TasaInteres
+                            TasaAplicada = CuentaAhorros.TASA_INTERES_AHORROS
                         });
                     }
                     else
@@ -89,7 +89,7 @@ namespace Fast_Bank.Application.Services
         {
             public int CuentasProcesadas { get; set; }
             public int CuentasOmitidas { get; set; }
-            public decimal MontoTotalAcreditado { get; set; }
+            public double MontoTotalAcreditado { get; set; }
             public List<string> Errores { get; set; } = new();
             public List<DetalleAcreditacion> DetallesPorCuenta { get; set; } = new();
         }
@@ -97,20 +97,20 @@ namespace Fast_Bank.Application.Services
         public class DetalleAcreditacion
         {
             public string NumeroCuenta { get; set; } = string.Empty;
-            public decimal SaldoAnterior { get; set; }
-            public decimal MontoInteres { get; set; }
-            public decimal SaldoNuevo { get; set; }
+            public double SaldoAnterior { get; set; }
+            public double MontoInteres { get; set; }
+            public double SaldoNuevo { get; set; }
             public double TasaAplicada { get; set; }
         }
 
         public class SimulacionInteresResult
         {
             public string NumeroCuenta { get; set; } = string.Empty;
-            public decimal SaldoActual { get; set; }
+            public double SaldoActual { get; set; }
             public double TasaInteresAnual { get; set; }
             public double TasaInteresMensual { get; set; }
-            public decimal InteresCalculado { get; set; }
-            public decimal SaldoProyectado { get; set; }
+            public double InteresCalculado { get; set; }
+            public double SaldoProyectado { get; set; }
         }
 
         // Métodos para intereses de sobregiro en cuentas corrientes
@@ -180,7 +180,7 @@ namespace Fast_Bank.Application.Services
         {
             public int CuentasProcesadas { get; set; }
             public int CuentasOmitidas { get; set; }
-            public decimal MontoTotalCobrado { get; set; }
+            public double MontoTotalCobrado { get; set; }
             public List<string> Errores { get; set; } = new();
             public List<DetalleCobro> DetallesPorCuenta { get; set; } = new();
         }
@@ -188,10 +188,10 @@ namespace Fast_Bank.Application.Services
         public class DetalleCobro
         {
             public string NumeroCuenta { get; set; } = string.Empty;
-            public decimal SaldoAnterior { get; set; }
-            public decimal MontoInteres { get; set; }
-            public decimal SaldoNuevo { get; set; }
-            public decimal TasaAplicada { get; set; }
+            public double SaldoAnterior { get; set; }
+            public double MontoInteres { get; set; }
+            public double SaldoNuevo { get; set; }
+            public double TasaAplicada { get; set; }
         }
     }
 }

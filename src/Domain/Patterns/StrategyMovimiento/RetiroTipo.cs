@@ -6,7 +6,7 @@ namespace Domain.Logic
 {
     public class RetiroTipo : ITipoMovimiento
     {
-        private const decimal MONTO_MAXIMO_POR_MOVIMIENTO = 5000m;
+        private const double MONTO_MAXIMO_POR_MOVIMIENTO = 5000.0;
 
         public void procesar(Movimiento movimiento)
         {

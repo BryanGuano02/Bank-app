@@ -2,7 +2,7 @@ namespace Fast_Bank.Application.DTOs.Cuenta
 {
     public class CuentaCorrienteDto : CuentaDtoBase
     {
-        public decimal LimiteSobregiro { get; set; }
-        public decimal SaldoDisponible { get; set; }
+        public double LimiteSobregiro { get; set; }
+        public double SaldoDisponible { get; set; }
     }
 }

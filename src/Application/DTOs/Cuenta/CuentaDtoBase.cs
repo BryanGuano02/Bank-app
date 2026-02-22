@@ -6,7 +6,7 @@ namespace Fast_Bank.Application.DTOs.Cuenta
     {
         public string NumeroCuenta { get; set; } = string.Empty;
         public string TipoCuenta { get; set; } = string.Empty;
-        public decimal Saldo { get; set; }
+        public double Saldo { get; set; }
         public DateTime FechaApertura { get; set; }
     }
 }

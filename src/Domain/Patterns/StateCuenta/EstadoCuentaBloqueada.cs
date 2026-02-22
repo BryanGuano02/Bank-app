@@ -6,17 +6,17 @@ namespace Domain.Patterns.State;
 
 public class EstadoCuentaBloqueada : IEstadoCuenta
 {
-    public void Depositar(Cuenta cuenta, decimal monto)
+    public void Depositar(Cuenta cuenta, double monto)
     {
         throw new InvalidOperationException("No se pueden realizar depósitos en una cuenta bloqueada.");
     }
 
-    public void Retirar(Cuenta cuenta, decimal monto)
+    public void Retirar(Cuenta cuenta, double monto)
     {
         throw new InvalidOperationException("No se pueden realizar retiros de una cuenta bloqueada.");
     }
 
-    public void Transferir(Cuenta cuenta, Cuenta destino, decimal monto)
+    public void Transferir(Cuenta cuenta, Cuenta destino, double monto)
     {
         throw new InvalidOperationException("No se pueden realizar transferencias desde una cuenta bloqueada.");
     }

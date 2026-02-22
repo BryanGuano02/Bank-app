@@ -17,7 +17,7 @@ public class MovimientoUseCase
         _domainMovimientoService = domainMovimientoService ?? throw new ArgumentNullException(nameof(domainMovimientoService));
     }
 
-    public async Task<string> DepositarAsync(string numeroCuentaDestino, decimal monto, string descripcion)
+    public async Task<string> DepositarAsync(string numeroCuentaDestino, double monto, string descripcion)
     {
         if (string.IsNullOrWhiteSpace(numeroCuentaDestino)) throw new ArgumentException("Número de cuenta destino inválido.", nameof(numeroCuentaDestino));
         if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser mayor que cero.");
@@ -33,7 +33,7 @@ public class MovimientoUseCase
         return movimiento.IdMovimiento;
     }
 
-    public async Task<string> RetirarAsync(string numeroCuentaOrigen, decimal monto, string descripcion)
+    public async Task<string> RetirarAsync(string numeroCuentaOrigen, double monto, string descripcion)
     {
         if (string.IsNullOrWhiteSpace(numeroCuentaOrigen)) throw new ArgumentException("Número de cuenta origen inválido.", nameof(numeroCuentaOrigen));
         if (monto <= 0) throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser mayor que cero.");
@@ -49,7 +49,7 @@ public class MovimientoUseCase
         return movimiento.IdMovimiento;
     }
 
-    public async Task<string> TransferirAsync(string numeroCuentaOrigen, string numeroCuentaDestino, decimal monto, string descripcion)
+    public async Task<string> TransferirAsync(string numeroCuentaOrigen, string numeroCuentaDestino, double monto, string descripcion)
     {
         if (string.IsNullOrWhiteSpace(numeroCuentaOrigen)) throw new ArgumentException("Número de cuenta origen inválido.", nameof(numeroCuentaOrigen));
         if (string.IsNullOrWhiteSpace(numeroCuentaDestino)) throw new ArgumentException("Número de cuenta destino inválido.", nameof(numeroCuentaDestino));

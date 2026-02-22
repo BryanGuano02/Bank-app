@@ -28,7 +28,7 @@ public class ClienteController : ControllerBase
         public string Direccion { get; set; } = string.Empty;
         public string Correo { get; set; } = string.Empty;
         public string Telefono { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
+        public double SaldoInicial { get; set; }
         public TipoCuenta TipoCuenta { get; set; }
     }
 
@@ -40,7 +40,7 @@ public class ClienteController : ControllerBase
         public string Direccion { get; set; } = string.Empty;
         public string Correo { get; set; } = string.Empty;
         public string Telefono { get; set; } = string.Empty;
-        public decimal SaldoInicial { get; set; }
+        public double SaldoInicial { get; set; }
         public TipoCuenta TipoCuenta { get; set; }
     }
 
@@ -204,7 +204,7 @@ public class ClienteController : ControllerBase
             else if (cliente.Cuenta is CuentaAhorros ca)
             {
                 cuentaDto.TipoCuenta = "Ahorros";
-                cuentaDto.TasaInteres = ca.TasaInteres;
+                cuentaDto.TasaInteres = CuentaAhorros.TASA_INTERES_AHORROS;
             }
         }
 
@@ -274,14 +274,14 @@ public class ClienteController : ControllerBase
     {
         public string NumeroCuenta { get; set; } = string.Empty;
         public string TipoCuenta { get; set; } = string.Empty;
-        public decimal Saldo { get; set; }
+        public double Saldo { get; set; }
         public DateTime FechaApertura { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public decimal? LimiteSobregiro { get; set; }
+        public double? LimiteSobregiro { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public decimal? InteresSobregiro { get; set; }
+        public double? InteresSobregiro { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TasaInteres { get; set; }

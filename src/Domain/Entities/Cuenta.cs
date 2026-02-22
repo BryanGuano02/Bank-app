@@ -11,7 +11,7 @@ namespace Domain.Entities
     {
         [Key]
         public string NumeroCuenta { get; private set; }
-        public decimal Saldo { get; private set; }
+        public double Saldo { get; private set; }
         public DateTime FechaApertura { get; private set; }
 
         private IEstadoCuenta _estado;
@@ -26,13 +26,13 @@ namespace Domain.Entities
         protected Cuenta()
         {
             NumeroCuenta = string.Empty;
-            Saldo = 0m;
+            Saldo = 0.0;
             FechaApertura = DateTime.UtcNow;
             // Assign a sensible default state when EF materializes the entity
             _estado = new EstadoCuentaActiva();
         }
 
-        protected Cuenta(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
+        protected Cuenta(string numeroCuenta, double saldoInicial, IEstadoCuenta estadoInicial)
         {
             NumeroCuenta = numeroCuenta;
             Saldo = saldoInicial;
@@ -51,12 +51,12 @@ namespace Domain.Entities
             _estado = nuevoEstado;
         }
 
-        internal void ModificarSaldo(decimal monto)
+        internal void ModificarSaldo(double monto)
         {
             Saldo = FinancialRounding.RoundMoney(Saldo + monto);
         }
 
-        public void Depositar(decimal monto)
+        public void Depositar(double monto)
         {
             _estado.Depositar(this, monto);
         }
@@ -65,13 +65,13 @@ namespace Domain.Entities
         {
         }
 
-        protected void AplicarMontoInteres(decimal monto)
+        protected void AplicarMontoInteres(double monto)
         {
-            if (monto == 0m) return;
+            if (monto == 0.0) return;
             ModificarSaldo(monto);
         }
 
-        public virtual void Retirar(decimal monto)
+        public virtual void Retirar(double monto)
         {
             _estado.Retirar(this, monto);
         }

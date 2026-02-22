@@ -57,7 +57,7 @@ public class ClienteUseCase
 
     public async Task<Cliente> CrearClienteConCuentaCorrienteAsync(
         string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        decimal saldoInicial)
+        double saldoInicial)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
 
@@ -76,7 +76,7 @@ public class ClienteUseCase
 
     public async Task<Cliente> CrearClienteConCuentaAhorrosAsync(
         string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        decimal saldoInicial)
+        double saldoInicial)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
 
@@ -96,7 +96,7 @@ public class ClienteUseCase
     // Nuevo método unificado para crear cliente con cuenta usando enum
     public async Task<Cliente> CrearClienteConCuentaAsync(
         string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        decimal saldoInicial, TipoCuenta tipoCuenta)
+        double saldoInicial, TipoCuenta tipoCuenta)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
 
@@ -132,7 +132,7 @@ public class ClienteUseCase
     // Nuevo método para crear cliente con cuenta y tarjeta de crédito
     public async Task<Cliente> CrearClienteConCuentaYTarjetaAsync(
         string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        decimal saldoInicial, TipoCuenta tipoCuenta)
+        double saldoInicial, TipoCuenta tipoCuenta)
     {
         if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
 

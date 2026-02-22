@@ -7,21 +7,21 @@ namespace Domain.Entities
 {
     public class CuentaCorriente : Cuenta
     {
-        public const decimal TASA_INTERES_SOBREGIRO = 0.22m; // 22%
-        public decimal LimiteSobregiro { get; private set; } = 200m;
-        public decimal InteresSobregiro { get; private set; } = TASA_INTERES_SOBREGIRO;
+        public const double TASA_INTERES_SOBREGIRO = 0.22; // 22%
+        public double LimiteSobregiro { get; private set; } = 200.0;
+        public double InteresSobregiro { get; private set; } = TASA_INTERES_SOBREGIRO;
 
         // Parameterless constructor for EF Core
         protected CuentaCorriente() : base()
         {
         }
 
-        public CuentaCorriente(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
+        public CuentaCorriente(string numeroCuenta, double saldoInicial, IEstadoCuenta estadoInicial)
             : base(numeroCuenta, saldoInicial, estadoInicial)
         {
         }
 
-        public static CuentaCorriente Create(string numeroCuenta, decimal saldoInicial, IEstadoCuenta estadoInicial)
+        public static CuentaCorriente Create(string numeroCuenta, double saldoInicial, IEstadoCuenta estadoInicial)
         {
             if (string.IsNullOrWhiteSpace(numeroCuenta)) throw new ArgumentException("Número de cuenta inválido.", nameof(numeroCuenta));
             if (estadoInicial == null) throw new ArgumentNullException(nameof(estadoInicial));
@@ -29,7 +29,7 @@ namespace Domain.Entities
             return new CuentaCorriente(numeroCuenta, saldoInicial, estadoInicial);
         }
 
-        public override void Retirar(decimal monto)
+        public override void Retirar(double monto)
         {
             if ((Saldo + LimiteSobregiro) - monto < 0)
                 throw new InvalidOperationException("Excede límite de sobregiro.");
@@ -39,17 +39,17 @@ namespace Domain.Entities
 
         public override void AplicarInteresMensual()
         {
-            // Interés de sobregiro: InteresSobregiro está en formato decimal (ej. 0.22m => 22%)
-            decimal tasaMensual = InteresSobregiro / 12m;
-            if (tasaMensual <= 0m) return;
+            // Interés de sobregiro: InteresSobregiro está en formato double (ej. 0.22 => 22%)
+            double tasaMensual = InteresSobregiro / 12.0;
+            if (tasaMensual <= 0.0) return;
 
             // Aplicar interés sólo si hay saldo negativo (se cobrá en sobregiro)
-            if (Saldo < 0m)
+            if (Saldo < 0.0)
             {
-                decimal montoSobregiro = Math.Abs(Saldo);
-                decimal montoInteres = montoSobregiro * tasaMensual;
+                double montoSobregiro = Math.Abs(Saldo);
+                double montoInteres = montoSobregiro * tasaMensual;
                 montoInteres = FinancialRounding.RoundMoney(montoInteres);
-                if (montoInteres == 0m) return;
+                if (montoInteres == 0.0) return;
 
                 // Cargar el interés (resta al saldo)
                 AplicarMontoInteres(-montoInteres);
