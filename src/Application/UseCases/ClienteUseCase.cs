@@ -55,43 +55,43 @@ public class ClienteUseCase
         return cliente;
     }
 
-    public async Task<Cliente> CrearClienteConCuentaCorrienteAsync(
-        string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        double saldoInicial)
-    {
-        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
+    // public async Task<Cliente> CrearClienteConCuentaCorrienteAsync(
+    //     string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
+    //     double saldoInicial)
+    // {
+    //     if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
 
-        var existeCliente = await _context.Clientes.FindAsync(cedula);
-        if (existeCliente != null) throw new InvalidOperationException("El cliente ya existe.");
+    //     var existeCliente = await _context.Clientes.FindAsync(cedula);
+    //     if (existeCliente != null) throw new InvalidOperationException("El cliente ya existe.");
 
-        var cliente = _domainClienteService.CrearClienteConCuentaCorriente(
-            cedula, nombre, apellido, direccion, correo, telefono,
-            saldoInicial);
+    //     var cliente = _domainClienteService.CrearClienteConCuentaCorriente(
+    //         cedula, nombre, apellido, direccion, correo, telefono,
+    //         saldoInicial);
 
-        await _context.Clientes.AddAsync(cliente);
-        await _context.SaveChangesAsync();
+    //     await _context.Clientes.AddAsync(cliente);
+    //     await _context.SaveChangesAsync();
 
-        return cliente;
-    }
+    //     return cliente;
+    // }
 
-    public async Task<Cliente> CrearClienteConCuentaAhorrosAsync(
-        string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
-        double saldoInicial)
-    {
-        if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
+    // public async Task<Cliente> CrearClienteConCuentaAhorrosAsync(
+    //     string cedula, string nombre, string apellido, string direccion, string correo, string telefono,
+    //     double saldoInicial)
+    // {
+    //     if (string.IsNullOrWhiteSpace(cedula)) throw new ArgumentException("Cédula inválida.", nameof(cedula));
 
-        var existeCliente = await _context.Clientes.FindAsync(cedula);
-        if (existeCliente != null) throw new InvalidOperationException("El cliente ya existe.");
+    //     var existeCliente = await _context.Clientes.FindAsync(cedula);
+    //     if (existeCliente != null) throw new InvalidOperationException("El cliente ya existe.");
 
-        var cliente = _domainClienteService.CrearClienteConCuentaAhorros(
-            cedula, nombre, apellido, direccion, correo, telefono,
-            saldoInicial);
+    //     var cliente = _domainClienteService.CrearClienteConCuentaAhorros(
+    //         cedula, nombre, apellido, direccion, correo, telefono,
+    //         saldoInicial);
 
-        await _context.Clientes.AddAsync(cliente);
-        await _context.SaveChangesAsync();
+    //     await _context.Clientes.AddAsync(cliente);
+    //     await _context.SaveChangesAsync();
 
-        return cliente;
-    }
+    //     return cliente;
+    // }
 
     // Nuevo método unificado para crear cliente con cuenta usando enum
     public async Task<Cliente> CrearClienteConCuentaAsync(

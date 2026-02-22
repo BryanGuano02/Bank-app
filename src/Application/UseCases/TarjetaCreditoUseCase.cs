@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Domain.Entities;
 using Fast_Bank.Infrastructure.Persistence;
 using Fast_Bank.Domain.Patterns.StrategyTarjetaCredito;
+using Microsoft.EntityFrameworkCore;
 using DomainTarjetaCreditoService = Domain.Services.TarjetaCreditoService;
 
 namespace Fast_Bank.Application.Services;
@@ -16,6 +17,29 @@ public class TarjetaCreditoUseCase
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _domainTarjetaCreditoService = domainTarjetaCreditoService ?? throw new ArgumentNullException(nameof(domainTarjetaCreditoService));
+    }
+
+    public async Task<string> CrearTarjetaAsync(string idCliente)
+    {
+        if (string.IsNullOrWhiteSpace(idCliente))
+            throw new ArgumentException("El ID del cliente es requerido.", nameof(idCliente));
+
+        var cliente = await _context.Clientes.FindAsync(idCliente);
+        if (cliente == null)
+            throw new InvalidOperationException($"Cliente {idCliente} no encontrado.");
+
+        var tarjetaExistente = await _context.TarjetasCredito
+            .FirstOrDefaultAsync(t => t.IdCliente == idCliente);
+
+        if (tarjetaExistente != null)
+            throw new InvalidOperationException($"El cliente {idCliente} ya tiene una tarjeta de crédito asignada ({tarjetaExistente.NumeroTarjeta}).");
+
+        var tarjeta = _domainTarjetaCreditoService.CrearTarjetaCredito(idCliente);
+
+        _context.TarjetasCredito.Add(tarjeta);
+        await _context.SaveChangesAsync();
+
+        return tarjeta.NumeroTarjeta;
     }
 
     public async Task<string> RealizarCompraAsync(string numeroTarjeta, double monto, string descripcion)

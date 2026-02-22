@@ -31,6 +31,32 @@ public class TarjetasCreditoController : ControllerBase
         public double Monto { get; set; }
     }
 
+    [HttpPost("cliente/{idCliente}")]
+    public async Task<IActionResult> CrearTarjeta(string idCliente)
+    {
+        if (string.IsNullOrWhiteSpace(idCliente))
+            return BadRequest("El ID del cliente es requerido.");
+
+        try
+        {
+            var numeroTarjeta = await _useCase.CrearTarjetaAsync(idCliente);
+            var tarjeta = await _queryService.ObtenerPorNumeroAsync(numeroTarjeta);
+
+            return CreatedAtAction(
+                nameof(GetByNumero),
+                new { numeroTarjeta },
+                new { Mensaje = "Tarjeta de crédito creada y asignada exitosamente.", Tarjeta = tarjeta });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { error = ex.Message });
+        }
+        catch (System.ArgumentException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     /// <summary>
     /// Obtener información de una tarjeta de crédito por su número
     /// </summary>
