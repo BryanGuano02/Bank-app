@@ -35,5 +35,17 @@ namespace Domain.Entities
                 throw new InvalidOperationException("Fondos insuficientes.");
             base.Retirar(monto);
         }
+
+        public override void AplicarInteresMensual()
+        {
+            // Tratamos TASA_INTERES_AHORROS como porcentaje (ej. 3.0 => 3%)
+            decimal tasaMensual = (decimal)TASA_INTERES_AHORROS / 100m / 12m;
+            if (tasaMensual <= 0m) return;
+
+            decimal montoInteres = Saldo * tasaMensual;
+            if (montoInteres == 0m) return;
+
+            AplicarMontoInteres(montoInteres);
+        }
     }
 }

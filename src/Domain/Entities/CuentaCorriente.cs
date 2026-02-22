@@ -35,5 +35,23 @@ namespace Domain.Entities
 
             base.Retirar(monto);
         }
+
+        public override void AplicarInteresMensual()
+        {
+            // Interés de sobregiro: InteresSobregiro está en formato decimal (ej. 0.22m => 22%)
+            decimal tasaMensual = InteresSobregiro / 12m;
+            if (tasaMensual <= 0m) return;
+
+            // Aplicar interés sólo si hay saldo negativo (se cobrá en sobregiro)
+            if (Saldo < 0m)
+            {
+                decimal montoSobregiro = Math.Abs(Saldo);
+                decimal montoInteres = montoSobregiro * tasaMensual;
+                if (montoInteres == 0m) return;
+
+                // Cargar el interés (resta al saldo)
+                AplicarMontoInteres(-montoInteres);
+            }
+        }
     }
 }

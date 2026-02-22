@@ -60,6 +60,16 @@ namespace Domain.Entities
             _estado.Depositar(this, monto);
         }
 
+        public virtual void AplicarInteresMensual()
+        {
+        }
+
+        protected void AplicarMontoInteres(decimal monto)
+        {
+            if (monto == 0m) return;
+            ModificarSaldo(monto);
+        }
+
         public virtual void Retirar(decimal monto)
         {
             _estado.Retirar(this, monto);

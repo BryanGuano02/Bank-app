@@ -6,6 +6,7 @@ using Domain.Entities;
 using Fast_Bank.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using DomainInteresesService = Domain.Services.InteresesService;
+using Domain.Logic;
 
 namespace Fast_Bank.Application.Services
 {
@@ -31,16 +32,25 @@ namespace Fast_Bank.Application.Services
             {
                 try
                 {
-                    // Calcular inter�s
+                    // Calcular interés esperado (usado para registro y validación)
                     var montoInteres = _domainInteresesService.CalcularInteresMensual(cuenta);
 
-                    // Si el inter�s es mayor a cero, acreditarlo
+                    // Si el interés es mayor a cero, aplicarlo en la entidad y registrar el movimiento
                     if (montoInteres > 0)
                     {
-                        var movimiento = _domainInteresesService.CrearYEjecutarAcreditacionInteres(
+                        var saldoAnterior = cuenta.Saldo;
+
+                        // Aplicar el interés en la entidad (usa la lógica de CuentaAhorros)
+                        cuenta.AplicarInteresMensual();
+
+                        // Crear el movimiento de acreditación pero NO ejecutar, porque ya aplicamos el saldo
+                        var movimiento = Movimiento.Create(
                             Guid.NewGuid().ToString(),
+                            montoInteres,
+                            null,
                             cuenta,
-                            montoInteres
+                            $"Interés mensual - Tasa: {cuenta.TasaInteres:P2}",
+                            new InteresTipo()
                         );
 
                         await _context.Movimientos.AddAsync(movimiento);
@@ -50,7 +60,7 @@ namespace Fast_Bank.Application.Services
                         resultado.DetallesPorCuenta.Add(new DetalleAcreditacion
                         {
                             NumeroCuenta = cuenta.NumeroCuenta,
-                            SaldoAnterior = cuenta.Saldo - montoInteres,
+                            SaldoAnterior = saldoAnterior,
                             MontoInteres = montoInteres,
                             SaldoNuevo = cuenta.Saldo,
                             TasaAplicada = cuenta.TasaInteres
@@ -114,16 +124,23 @@ namespace Fast_Bank.Application.Services
             {
                 try
                 {
-                    // Calcular interés de sobregiro
                     var montoInteres = _domainInteresesService.CalcularInteresSobregiro(cuenta);
 
-                    // Si el interés es mayor a cero, cobrarlo
                     if (montoInteres > 0)
                     {
-                        var movimiento = _domainInteresesService.CrearYEjecutarCargoInteresSobregiro(
+                        var saldoAnterior = cuenta.Saldo;
+
+                        // Aplicar el cargo de interés en la entidad (CuentaCorriente) - el método resta el interés
+                        cuenta.AplicarInteresMensual();
+
+                        // Registrar movimiento sin ejecutar (ya se aplicó)
+                        var movimiento = Movimiento.Create(
                             Guid.NewGuid().ToString(),
+                            montoInteres,
+                            null,
                             cuenta,
-                            montoInteres
+                            $"Interés por sobregiro - Tasa: {cuenta.InteresSobregiro:P2}",
+                            new InteresTipo()
                         );
 
                         await _context.Movimientos.AddAsync(movimiento);
@@ -133,7 +150,7 @@ namespace Fast_Bank.Application.Services
                         resultado.DetallesPorCuenta.Add(new DetalleCobro
                         {
                             NumeroCuenta = cuenta.NumeroCuenta,
-                            SaldoAnterior = cuenta.Saldo + montoInteres, // Era menos negativo
+                            SaldoAnterior = saldoAnterior,
                             MontoInteres = montoInteres,
                             SaldoNuevo = cuenta.Saldo,
                             TasaAplicada = cuenta.InteresSobregiro
