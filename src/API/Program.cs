@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Fast_Bank.Infrastructure.Persistence;
 using Fast_Bank.Application.Services;
-using Fast_Bank.API.BackgroundServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -40,7 +39,6 @@ builder.Services.AddScoped<Domain.Services.CuentaService>();
 builder.Services.AddScoped<Domain.Services.InteresesService>();
 builder.Services.AddScoped<Domain.Services.TarjetaCreditoService>();
 
-builder.Services.AddHostedService<InteresesBackgroundService>();
 
 // Configure OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
