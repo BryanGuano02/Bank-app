@@ -42,7 +42,6 @@ public class TarjetaCreditoQueryService
             FechaVencimiento = tarjeta.FechaVencimiento,
             TasaInteresMensual = Math.Round(tarjeta.TasaInteresMensual, 4, MidpointRounding.ToEven),
             PagoMinimo = Math.Round(tarjeta.PagoMinimo, 2, MidpointRounding.ToEven),
-            // EstaVencida se elimina de la respuesta pública
         };
     }
 }

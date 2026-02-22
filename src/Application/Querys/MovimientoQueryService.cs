@@ -43,7 +43,7 @@ namespace Fast_Bank.Application.Services
                 .Include(m => m.Origen)
                 .Include(m => m.Destino)
                 .Where(m => (m.Origen != null && m.Origen.NumeroCuenta == numeroCuenta) ||
-                            m.Destino.NumeroCuenta == numeroCuenta)
+                            (m.Destino != null && m.Destino.NumeroCuenta == numeroCuenta))
                 .OrderByDescending(m => m.Fecha)
                 .ToListAsync();
 
