@@ -29,6 +29,14 @@ namespace Fast_Bank.Infrastructure.Persistence
                 b.HasDiscriminator<string>("TipoCuenta")
                     .HasValue<CuentaAhorros>("Ahorros")
                     .HasValue<CuentaCorriente>("Corriente");
+
+                // Configurar la navegación inversa desde el Agregado hacia sus Movimientos.
+                // EF Core usará el backing field _movimientos para cargar/rastrear la colección.
+                b.HasMany(c => c.Movimientos)
+                    .WithOne(m => m.Destino)
+                    .IsRequired();
+                b.Navigation(c => c.Movimientos)
+                    .UsePropertyAccessMode(PropertyAccessMode.Field);
             });
 
             // Configurar relación uno-a-uno entre Cliente y Cuenta especificando la FK

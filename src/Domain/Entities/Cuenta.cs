@@ -2,6 +2,7 @@ using Domain.Interfaces.States;
 using Domain.Patterns.State;
 using Fast_Bank.Domain.Utils;
 using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities
 {
@@ -15,6 +16,11 @@ namespace Domain.Entities
         public DateTime FechaApertura { get; private set; }
 
         private IEstadoCuenta _estado;
+
+        // Colección de movimientos gestionada por el Agregado.
+        // EF Core usa el campo _movimientos como backing field.
+        protected List<Movimiento> _movimientos = new();
+        public IReadOnlyCollection<Movimiento> Movimientos => _movimientos.AsReadOnly();
 
         // Navigation to the owning cliente (optional)
         public Cliente? Cliente { get; private set; }

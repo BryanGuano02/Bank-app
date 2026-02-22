@@ -1,197 +1,137 @@
+using Domain.Interfaces;
+using Domain.Interfaces.Repositories;
+using Fast_Bank.Application.DTOs.Interes;
+using Fast_Bank.Domain.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Entities;
-using Fast_Bank.Domain.Utils;
-using Fast_Bank.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using DomainInteresesService = Domain.Services.InteresesService;
-using Domain.Logic;
 
 namespace Fast_Bank.Application.Services
 {
     public class InteresesUseCase
     {
-        private readonly IDdContext _context;
-        private readonly DomainInteresesService _domainInteresesService = new();
+        private readonly ICuentaAhorroRepository _cuentaAhorroRepository;
+        private readonly ICuentaCorrienteRepository _cuentaCorrienteRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly DomainInteresesService _domainInteresesService;
 
-        public InteresesUseCase(IDdContext context)
+        private const int BatchSize = 1000;
+
+        public InteresesUseCase(
+            ICuentaAhorroRepository cuentaAhorroRepository,
+            ICuentaCorrienteRepository cuentaCorrienteRepository,
+            IUnitOfWork unitOfWork,
+            DomainInteresesService domainInteresesService)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _cuentaAhorroRepository = cuentaAhorroRepository ?? throw new ArgumentNullException(nameof(cuentaAhorroRepository));
+            _cuentaCorrienteRepository = cuentaCorrienteRepository ?? throw new ArgumentNullException(nameof(cuentaCorrienteRepository));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _domainInteresesService = domainInteresesService ?? throw new ArgumentNullException(nameof(domainInteresesService));
         }
 
         public async Task<AcreditacionInteresesResult> AcreditarInteresesMensualesAsync()
         {
             var resultado = new AcreditacionInteresesResult();
+            int page = 1;
+            bool hasMoreData = true;
 
-            var cuentasAhorros = await _context.CuentasAhorros
-                .Where(c => c.Saldo > 0) // Solo cuentas con saldo positivo
-                .ToListAsync();
-
-            foreach (var cuenta in cuentasAhorros)
+            while (hasMoreData)
             {
-                try
+                var cuentasBatch = await _cuentaAhorroRepository.GetCuentasConSaldoPositivoAsync(page, BatchSize);
+
+                if (!cuentasBatch.Any())
+                    break;
+
+                foreach (var cuenta in cuentasBatch)
                 {
-                    // Calcular interés esperado (usado para registro y validación)
-                    var montoInteres = _domainInteresesService.CalcularInteresMensual(cuenta);
-                    montoInteres = FinancialRounding.RoundMoney(montoInteres);
-
-                    // Si el interés es mayor a cero, aplicarlo en la entidad y registrar el movimiento
-                    if (montoInteres > 0)
+                    try
                     {
-                        var saldoAnterior = cuenta.Saldo;
+                        // 1. El Domain Service hace el cálculo complejo
+                        var montoInteres = _domainInteresesService.CalcularInteresMensual(cuenta);
+                        montoInteres = FinancialRounding.RoundMoney(montoInteres);
 
-                        // Aplicar el interés en la entidad (usa la lógica de CuentaAhorros)
-                        cuenta.AplicarInteresMensual();
+                        // 2. La Entidad aplica las reglas de negocio, altera su estado y crea el Movimiento
+                        var detalleAcreditacion = cuenta.AplicarInteresMensual(montoInteres);
 
-                        // Crear el movimiento de acreditación pero NO ejecutar, porque ya aplicamos el saldo
-                        var movimiento = Movimiento.Create(
-                            Guid.NewGuid().ToString(),
-                            montoInteres,
-                            null,
-                            cuenta,
-                            $"Interés mensual - Tasa: {CuentaAhorros.TASA_INTERES_AHORROS:P2}",
-                            new InteresTipo()
-                        );
-
-                        await _context.Movimientos.AddAsync(movimiento);
-
-                        resultado.CuentasProcesadas++;
-                        resultado.MontoTotalAcreditado = FinancialRounding.RoundMoney(resultado.MontoTotalAcreditado + montoInteres);
-                        resultado.DetallesPorCuenta.Add(new DetalleAcreditacion
+                        // 3. El Caso de Uso solo reacciona al resultado para armar el reporte
+                        if (detalleAcreditacion != null)
                         {
-                            NumeroCuenta = cuenta.NumeroCuenta,
-                            SaldoAnterior = saldoAnterior,
-                            MontoInteres = montoInteres,
-                            SaldoNuevo = cuenta.Saldo,
-                            TasaAplicada = CuentaAhorros.TASA_INTERES_AHORROS
-                        });
+                            resultado.CuentasProcesadas++;
+                            resultado.MontoTotalAcreditado += montoInteres;
+                            resultado.DetallesPorCuenta.Add(detalleAcreditacion);
+                        }
+                        else
+                        {
+                            resultado.CuentasOmitidas++;
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        resultado.CuentasOmitidas++;
+                        resultado.Errores.Add($"Error en cuenta {cuenta.NumeroCuenta}: {ex.Message}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    resultado.Errores.Add($"Error en cuenta {cuenta.NumeroCuenta}: {ex.Message}");
-                }
+
+                await _unitOfWork.SaveChangesAsync();
+                page++;
+
+                hasMoreData = cuentasBatch.Count() == BatchSize;
             }
 
-            await _context.SaveChangesAsync();
-
+            resultado.MontoTotalAcreditado = FinancialRounding.RoundMoney(resultado.MontoTotalAcreditado);
             return resultado;
         }
 
-        // DTOs de respuesta
-        public class AcreditacionInteresesResult
-        {
-            public int CuentasProcesadas { get; set; }
-            public int CuentasOmitidas { get; set; }
-            public double MontoTotalAcreditado { get; set; }
-            public List<string> Errores { get; set; } = new();
-            public List<DetalleAcreditacion> DetallesPorCuenta { get; set; } = new();
-        }
-
-        public class DetalleAcreditacion
-        {
-            public string NumeroCuenta { get; set; } = string.Empty;
-            public double SaldoAnterior { get; set; }
-            public double MontoInteres { get; set; }
-            public double SaldoNuevo { get; set; }
-            public double TasaAplicada { get; set; }
-        }
-
-        public class SimulacionInteresResult
-        {
-            public string NumeroCuenta { get; set; } = string.Empty;
-            public double SaldoActual { get; set; }
-            public double TasaInteresAnual { get; set; }
-            public double TasaInteresMensual { get; set; }
-            public double InteresCalculado { get; set; }
-            public double SaldoProyectado { get; set; }
-        }
-
-        // Métodos para intereses de sobregiro en cuentas corrientes
         public async Task<AcreditacionInteresSobregiroResult> AcreditarInteresSobregiroATodas()
         {
             var resultado = new AcreditacionInteresSobregiroResult();
+            int page = 1;
+            bool hasMoreData = true;
 
-            var cuentasCorrientes = await _context.CuentasCorrientes
-                .Where(c => c.Saldo < 0) // Solo cuentas en sobregiro
-                .ToListAsync();
-
-            foreach (var cuenta in cuentasCorrientes)
+            while (hasMoreData)
             {
-                try
+                var cuentasBatch = await _cuentaCorrienteRepository.GetCuentasEnSobregiroAsync(page, BatchSize);
+
+                if (!cuentasBatch.Any())
+                    break;
+
+                foreach (var cuenta in cuentasBatch)
                 {
-                    var montoInteres = _domainInteresesService.CalcularInteresSobregiro(cuenta);
-                    montoInteres = FinancialRounding.RoundMoney(montoInteres);
-
-                    if (montoInteres > 0)
+                    try
                     {
-                        var saldoAnterior = cuenta.Saldo;
+                        // 1. El Domain Service hace el cálculo complejo
+                        var montoInteres = _domainInteresesService.CalcularInteresSobregiro(cuenta);
+                        montoInteres = FinancialRounding.RoundMoney(montoInteres);
 
-                        // Aplicar el cargo de interés en la entidad (CuentaCorriente) - el método resta el interés
-                        cuenta.AplicarInteresMensual();
+                        // 2. La Entidad aplica las reglas de negocio, altera su estado y crea el Movimiento
+                        var detalleCobro = cuenta.AplicarInteresSobregiro(montoInteres);
 
-                        // Registrar movimiento sin ejecutar (ya se aplicó)
-                        var movimiento = Movimiento.Create(
-                            Guid.NewGuid().ToString(),
-                            montoInteres,
-                            null,
-                            cuenta,
-                            $"Interés por sobregiro - Tasa: {cuenta.InteresSobregiro:P2}",
-                            new InteresTipo()
-                        );
-
-                        await _context.Movimientos.AddAsync(movimiento);
-
-                        resultado.CuentasProcesadas++;
-                        resultado.MontoTotalCobrado = FinancialRounding.RoundMoney(resultado.MontoTotalCobrado + montoInteres);
-                        resultado.DetallesPorCuenta.Add(new DetalleCobro
+                        // 3. El Caso de Uso solo reacciona al resultado para armar el reporte
+                        if (detalleCobro != null)
                         {
-                            NumeroCuenta = cuenta.NumeroCuenta,
-                            SaldoAnterior = saldoAnterior,
-                            MontoInteres = montoInteres,
-                            SaldoNuevo = cuenta.Saldo,
-                            TasaAplicada = cuenta.InteresSobregiro
-                        });
+                            resultado.CuentasProcesadas++;
+                            resultado.MontoTotalCobrado += montoInteres;
+                            resultado.DetallesPorCuenta.Add(detalleCobro);
+                        }
+                        else
+                        {
+                            resultado.CuentasOmitidas++;
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        resultado.CuentasOmitidas++;
+                        resultado.Errores.Add($"Error en cuenta {cuenta.NumeroCuenta}: {ex.Message}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    resultado.Errores.Add($"Error en cuenta {cuenta.NumeroCuenta}: {ex.Message}");
-                }
+
+                await _unitOfWork.SaveChangesAsync();
+                page++;
+
+                hasMoreData = cuentasBatch.Count() == BatchSize;
             }
 
-            await _context.SaveChangesAsync();
-
+            resultado.MontoTotalCobrado = FinancialRounding.RoundMoney(resultado.MontoTotalCobrado);
             return resultado;
-        }
-
-        // DTOs adicionales para sobregiro
-        public class AcreditacionInteresSobregiroResult
-        {
-            public int CuentasProcesadas { get; set; }
-            public int CuentasOmitidas { get; set; }
-            public double MontoTotalCobrado { get; set; }
-            public List<string> Errores { get; set; } = new();
-            public List<DetalleCobro> DetallesPorCuenta { get; set; } = new();
-        }
-
-        public class DetalleCobro
-        {
-            public string NumeroCuenta { get; set; } = string.Empty;
-            public double SaldoAnterior { get; set; }
-            public double MontoInteres { get; set; }
-            public double SaldoNuevo { get; set; }
-            public double TasaAplicada { get; set; }
         }
     }
 }

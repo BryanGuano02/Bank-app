@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Interfaces;
+using Domain.Interfaces.Repositories;
 using Fast_Bank.Infrastructure.Persistence;
+using Fast_Bank.Infrastructure.Repositories;
 using Fast_Bank.Application.Services;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -23,6 +26,11 @@ builder.Services.AddDbContext<DdContext>(options =>
 // Expose IDdContext as a scoped dependency resolved to DdContext
 builder.Services.AddScoped<IDdContext>(sp => sp.GetRequiredService<DdContext>());
 
+// Infrastructure: repositories & unit of work
+builder.Services.AddScoped<ICuentaAhorroRepository, CuentaAhorroRepository>();
+builder.Services.AddScoped<ICuentaCorrienteRepository, CuentaCorrienteRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 // Application services
 builder.Services.AddScoped<MovimientoUseCase>();
 builder.Services.AddScoped<MovimientoQueryService>();
@@ -32,6 +40,7 @@ builder.Services.AddScoped<InteresesUseCase>();
 builder.Services.AddScoped<ClienteUseCase>();
 builder.Services.AddScoped<TarjetaCreditoUseCase>();
 builder.Services.AddScoped<TarjetaCreditoQueryService>();
+
 // Domain services (used by application services)
 builder.Services.AddScoped<Domain.Services.MovimientoService>();
 builder.Services.AddScoped<Domain.Services.ClienteService>();

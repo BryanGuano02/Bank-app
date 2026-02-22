@@ -1,5 +1,7 @@
 
 using Domain.Interfaces.States;
+using Domain.Logic;
+using Domain.ValueObjects;
 using Fast_Bank.Domain.Utils;
 using System;
 
@@ -34,6 +36,48 @@ namespace Domain.Entities
             base.Retirar(monto);
         }
 
+        /// <summary>
+        /// Aplica un monto de interés pre-calculado por el Domain Service.
+        /// Modifica el propio estado, crea el Movimiento y lo añade al Agregado.
+        /// </summary>
+        /// <returns>Detalle de la acreditación, o null si el monto no aplica.</returns>
+        public DetalleAcreditacion? AplicarInteresMensual(double montoInteres)
+        {
+            if (montoInteres <= 0)
+                return null;
+
+            var saldoAnterior = this.Saldo;
+
+            // 1. La entidad modifica su propio estado
+            ModificarSaldo(montoInteres);
+
+            // 2. La entidad crea su propio Movimiento (garantiza consistencia del Agregado)
+            var movimiento = Movimiento.Create(
+                Guid.NewGuid().ToString(),
+                montoInteres,
+                null,
+                this,
+                $"Interés mensual - Tasa: {TASA_INTERES_AHORROS:P2}",
+                new InteresTipo()
+            );
+
+            _movimientos.Add(movimiento);
+
+            // 3. Retorna la información necesaria para el reporte (Application layer)
+            return new DetalleAcreditacion
+            {
+                NumeroCuenta = this.NumeroCuenta,
+                SaldoAnterior = saldoAnterior,
+                MontoInteres = montoInteres,
+                SaldoNuevo = this.Saldo,
+                TasaAplicada = TASA_INTERES_AHORROS
+            };
+        }
+
+        /// <summary>
+        /// Sobrescritura del método base (sin parámetros) para compatibilidad interna.
+        /// Calcula y aplica el interés usando la tasa estática de la entidad.
+        /// </summary>
         public override void AplicarInteresMensual()
         {
             // Tratamos TASA_INTERES_AHORROS como porcentaje (ej. 3.0m => 3%)
