@@ -5,6 +5,8 @@ namespace Domain.Entities
 {
     public class TarjetaCredito
     {
+        public const int ANOS_VIGENCIA = 3;
+
         [Key]
         public string NumeroTarjeta { get; private set; }
         public double LimiteCredito { get; private set; }
@@ -24,26 +26,25 @@ namespace Domain.Entities
             NumeroTarjeta = string.Empty;
         }
 
-        public TarjetaCredito(string numeroTarjeta, double limiteCredito, DateTime fechaEmision, DateTime fechaVencimiento, double tasaInteresMensual)
+        public TarjetaCredito(string numeroTarjeta, double limiteCredito, DateTime fechaEmision, double tasaInteresMensual)
         {
             NumeroTarjeta = numeroTarjeta;
             LimiteCredito = limiteCredito;
             FechaEmision = fechaEmision;
-            FechaVencimiento = fechaVencimiento;
+            FechaVencimiento = fechaEmision.AddYears(ANOS_VIGENCIA);
             TasaInteresMensual = tasaInteresMensual;
             SaldoUtilizado = 0;
             CreditoDisponible = limiteCredito;
             PagoMinimo = 0;
         }
 
-        public static TarjetaCredito Create(string numeroTarjeta, double limiteCredito, DateTime fechaEmision, DateTime fechaVencimiento, double tasaInteresMensual)
+        public static TarjetaCredito Create(string numeroTarjeta, double limiteCredito, DateTime fechaEmision, double tasaInteresMensual)
         {
             if (string.IsNullOrWhiteSpace(numeroTarjeta)) throw new ArgumentException("Número de tarjeta inválido.", nameof(numeroTarjeta));
             if (limiteCredito <= 0) throw new ArgumentOutOfRangeException(nameof(limiteCredito), "Límite de crédito debe ser mayor que cero.");
-            if (fechaVencimiento <= fechaEmision) throw new ArgumentException("La fecha de vencimiento debe ser posterior a la fecha de emisión.");
             if (tasaInteresMensual < 0) throw new ArgumentOutOfRangeException(nameof(tasaInteresMensual), "La tasa de interés no puede ser negativa.");
 
-            return new TarjetaCredito(numeroTarjeta, limiteCredito, fechaEmision, fechaVencimiento, tasaInteresMensual);
+            return new TarjetaCredito(numeroTarjeta, limiteCredito, fechaEmision, tasaInteresMensual);
         }
 
         internal void IncrementarDeuda(double monto)

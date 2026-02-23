@@ -44,7 +44,6 @@ public class TarjetaCreditoService
             numeroTarjeta,
             LIMITE_CREDITO_DEFAULT,
             DateTime.Now,
-            DateTime.Now.AddYears(3),
             TASA_INTERES_MENSUAL_DEFAULT);
 
         tarjeta.IdCliente = idCliente;
