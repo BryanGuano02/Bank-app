@@ -9,8 +9,10 @@ namespace Domain.Entities
 {
     public class CuentaCorriente : Cuenta
     {
-        public const double TASA_INTERES_SOBREGIRO = 0.22; // 22%
-        public double LimiteSobregiro { get; private set; } = 200.0;
+        public const double TASA_INTERES_SOBREGIRO = 0.22;
+        public const double LIMITE_SOBREGIRO = 2000.0;
+
+        public double LimiteSobregiro { get; private set; } = LIMITE_SOBREGIRO;
         public double InteresSobregiro { get; private set; } = TASA_INTERES_SOBREGIRO;
 
         // Parameterless constructor for EF Core
