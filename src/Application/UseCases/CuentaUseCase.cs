@@ -114,7 +114,7 @@ namespace Fast_Bank.Application.Services
             var cuenta = await _context.Cuentas.FindAsync(numeroCuenta);
             if (cuenta == null) return false;
 
-            if (string.Equals(cuenta.NombreEstado, "Bloqueada", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(cuenta.Estado, "Bloqueada", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("La cuenta ya se encuentra bloqueada.");
 
             cuenta.CambiarEstado(new EstadoCuentaBloqueada());
@@ -130,7 +130,7 @@ namespace Fast_Bank.Application.Services
             var cuenta = await _context.Cuentas.FindAsync(numeroCuenta);
             if (cuenta == null) return false;
 
-            if (string.Equals(cuenta.NombreEstado, "Activa", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(cuenta.Estado, "Activa", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("La cuenta ya se encuentra activa.");
 
             cuenta.CambiarEstado(new EstadoCuentaActiva());

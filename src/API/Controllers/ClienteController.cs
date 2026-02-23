@@ -193,7 +193,7 @@ public class ClienteController : ControllerBase
                 NumeroCuenta = cliente.Cuenta.NumeroCuenta,
                 Saldo = cliente.Cuenta.Saldo,
                 FechaApertura = cliente.Cuenta.FechaApertura,
-                NombreEstado = cliente.Cuenta.NombreEstado
+                Estado = cliente.Cuenta.Estado
             };
 
             if (cliente.Cuenta is CuentaCorriente cc)
@@ -277,7 +277,7 @@ public class ClienteController : ControllerBase
         public string TipoCuenta { get; set; } = string.Empty;
         public double Saldo { get; set; }
         public DateTime FechaApertura { get; set; }
-        public string NombreEstado { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? LimiteSobregiro { get; set; }

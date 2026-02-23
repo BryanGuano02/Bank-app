@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Fast_Bank.Infrastructure.Persistence
 {
@@ -8,6 +9,14 @@ namespace Fast_Bank.Infrastructure.Persistence
         public DdContext(DbContextOptions<DdContext> options)
             : base(options)
         {
+            // Al cargar entidades desde la BD, reconstruir el objeto State
+            ChangeTracker.Tracked += (sender, e) =>
+            {
+                if (e.Entry.Entity is Cuenta cuenta)
+                {
+                    cuenta.ReconstruirEstadoDesdeBD();
+                }
+            };
         }
 
         // DbSet por cada entidad del dominio que necesites persistir
@@ -29,6 +38,14 @@ namespace Fast_Bank.Infrastructure.Persistence
                 b.HasDiscriminator<string>("TipoCuenta")
                     .HasValue<CuentaAhorros>("Ahorros")
                     .HasValue<CuentaCorriente>("Corriente");
+
+                // Ignorar el campo privado _estado (es un objeto State Pattern en memoria, no se persiste)
+                b.Ignore("_estado");
+
+                // Persistir el estado como columna string
+                b.Property(c => c.Estado)
+                    .IsRequired()
+                    .HasDefaultValue("Activa");
 
                 // Configurar la navegación inversa desde el Agregado hacia sus Movimientos.
                 // EF Core usará el backing field _movimientos para cargar/rastrear la colección.

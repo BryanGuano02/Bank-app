@@ -15,6 +15,9 @@ namespace Domain.Entities
         public double Saldo { get; private set; }
         public DateTime FechaApertura { get; private set; }
 
+        // Propiedad persistida por EF Core para guardar el estado en la BD
+        public string Estado { get; private set; }
+
         private IEstadoCuenta _estado;
 
         // Colección de movimientos gestionada por el Agregado.
@@ -27,14 +30,14 @@ namespace Domain.Entities
 
         // Foreign key property for the one-to-one relationship with Cliente
         public string? ClienteCedula { get; private set; }
-        public string NombreEstado => _estado.Nombre;
 
         protected Cuenta()
         {
             NumeroCuenta = string.Empty;
             Saldo = 0.0;
             FechaApertura = DateTime.UtcNow;
-            _estado = new EstadoCuentaActiva();
+            Estado = "Activa";
+            _estado = ResolverEstado(Estado);
         }
 
         protected Cuenta(string numeroCuenta, double saldoInicial, IEstadoCuenta estadoInicial)
@@ -43,6 +46,21 @@ namespace Domain.Entities
             Saldo = saldoInicial;
             FechaApertura = DateTime.UtcNow;
             _estado = estadoInicial;
+            Estado = estadoInicial.Nombre;
+        }
+
+        private static IEstadoCuenta ResolverEstado(string nombreEstado)
+        {
+            return nombreEstado switch
+            {
+                "Bloqueada" => new EstadoCuentaBloqueada(),
+                _ => new EstadoCuentaActiva(),
+            };
+        }
+
+        public void ReconstruirEstadoDesdeBD()
+        {
+            _estado = ResolverEstado(Estado);
         }
 
         internal void SetCliente(Cliente cliente)
@@ -54,6 +72,7 @@ namespace Domain.Entities
         public void CambiarEstado(IEstadoCuenta nuevoEstado)
         {
             _estado = nuevoEstado;
+            Estado = nuevoEstado.Nombre;
         }
 
 
