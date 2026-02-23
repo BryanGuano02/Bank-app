@@ -6,15 +6,26 @@ namespace Domain.Services
 {
     public class MovimientoService
     {
+        public const double MONTO_MAXIMO_TRANSACCION = 5000.0;
+
         public MovimientoService()
         {
+        }
+
+        private static void ValidarMonto(double monto)
+        {
+            if (monto <= 0)
+                throw new ArgumentOutOfRangeException(nameof(monto), "El monto debe ser mayor que cero.");
+            if (monto > MONTO_MAXIMO_TRANSACCION)
+                throw new InvalidOperationException($"El monto no puede superar el límite de {MONTO_MAXIMO_TRANSACCION:N2} por transacción.");
         }
 
         // Crea y ejecuta la lógica de un depósito. No persiste ni accede a la BD.
         public Movimiento Depositar(string idMovimiento, Cuenta destino, double monto, string descripcion)
         {
-            if (destino == null) throw new ArgumentNullException(nameof(destino));
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.", nameof(idMovimiento));
+            if (destino == null) throw new ArgumentNullException(nameof(destino));
+            ValidarMonto(monto);
 
             var movimiento = Movimiento.Create(idMovimiento, monto, null, destino, descripcion ?? string.Empty, new DepositoTipo());
 
@@ -27,8 +38,9 @@ namespace Domain.Services
         // Crea y ejecuta la lógica de un retiro. No persiste ni accede a la BD.
         public Movimiento Retirar(string idMovimiento, Cuenta origen, double monto, string descripcion)
         {
-            if (origen == null) throw new ArgumentNullException(nameof(origen));
             if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.", nameof(idMovimiento));
+            if (origen == null) throw new ArgumentNullException(nameof(origen));
+            ValidarMonto(monto);
 
             var movimiento = Movimiento.Create(idMovimiento, monto, origen, null, descripcion ?? string.Empty, new RetiroTipo());
 
@@ -40,17 +52,13 @@ namespace Domain.Services
         // Crea y ejecuta la lógica de una transferencia. No persiste ni accede a la BD.
         public Movimiento Transferir(string idMovimiento, Cuenta origen, Cuenta destino, double monto, string descripcion)
         {
+            if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.", nameof(idMovimiento));
             if (origen == null) throw new ArgumentNullException(nameof(origen));
             if (destino == null) throw new ArgumentNullException(nameof(destino));
-            if (string.IsNullOrWhiteSpace(idMovimiento)) throw new ArgumentException("IdMovimiento inválido.", nameof(idMovimiento));
+            ValidarMonto(monto);
 
             var movimiento = Movimiento.Create(idMovimiento, monto, origen, destino, descripcion ?? string.Empty, new TransferenciaTipo());
 
-            // Ejecuta la estrategia (modifica ambas cuentas en memoria)
-            // La validación se hace en:
-            // 1. TransferenciaTipo.validar() - valida monto máximo (5000), cuentas existentes
-            // 2. Cuenta.Retirar() en origen - valida saldo/sobregiro según tipo de cuenta
-            // 3. Cuenta.Depositar() en destino - acredita el monto
             movimiento.Ejecutar();
 
             return movimiento;
